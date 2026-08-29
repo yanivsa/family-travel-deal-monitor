@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T22:21:27.896479+03:00",
+  "generated_at": "2026-08-29T22:28:54.978291+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
@@ -45,16 +45,16 @@
     "provider_mode": "hybrid-live-feed",
     "last_attempt_at": "2026-08-29T22:10:33+03:00",
     "last_verified_live_refresh": "2026-08-29T22:10:33+03:00",
-    "note": "Only LCA completed end-to-end in this run; feed records only independently verified candidates and does not claim full-market coverage."
+    "note": "Only LCA completed end-to-end in this run (1 of 48 unique gateways); feed records only independently verified candidates and does not claim full-market coverage."
   },
   "scan_coverage": {
     "whitelist_profiles": 64,
-    "unique_gateways_total": 43,
+    "unique_gateways_total": 48,
     "gateways_live_checked_this_run": [
       "LCA"
     ],
     "status": "degraded",
-    "note": "Only LCA completed end-to-end in this run; feed records only independently verified candidates and does not claim full-market coverage."
+    "note": "Only LCA completed end-to-end in this run (1 of 48 unique gateways); feed records only independently verified candidates and does not claim full-market coverage."
   },
   "provider_health": {
     "World Airfares": {
@@ -83,7 +83,7 @@
     }
   },
   "price_drop_alerts": [],
-  "history_observations_added": 6,
+  "history_observations_added": 0,
   "deals": [
     {
       "stable_id": "cy-larnaca|2026-09-27|2026-10-01|A3-3527-3526|booking-298238",
