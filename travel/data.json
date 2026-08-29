@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T22:38:44.691681+03:00",
+  "generated_at": "2026-08-29T22:40:39.076271+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
@@ -30,6 +30,7 @@
       "family_friendly": true
     },
     "price_drop_threshold_pct": 30,
+    "max_candidate_age_minutes": 90,
     "primary_flight_provider": "World Airfares",
     "primary_hotel_provider": "Booking.com",
     "secondary_providers": [
