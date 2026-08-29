@@ -39,9 +39,27 @@ def component_keys(candidate):
     }
 
 
+def candidate_observed_at(candidate):
+    value = candidate.get("verified_at")
+    if not value:
+        raise ValueError("candidate is missing verified_at")
+    return parse_iso(value)
+
+
+def observation_id(candidate, key, component):
+    return f"{candidate['verified_at']}|{key}|{component}"
+
+
 def validate_feed(feed, config, whitelist):
     if len(whitelist) != 64:
         raise ValueError(f"destination whitelist must contain exactly 64 profiles, found {len(whitelist)}")
+
+    feed_verified_at = feed.get("verified_at")
+    if not feed_verified_at:
+        raise ValueError("provider feed is missing verified_at")
+    feed_time = parse_iso(feed_verified_at)
+    max_age = timedelta(minutes=float(config.get("max_candidate_age_minutes", 90)))
+    future_tolerance = timedelta(minutes=5)
 
     by_id = {item["id"]: item for item in whitelist}
     allowed_returns = set(config["return_dates"])
@@ -73,6 +91,15 @@ def validate_feed(feed, config, whitelist):
     for candidate in feed.get("candidates", []):
         if candidate.get("verified") is not True:
             continue
+        try:
+            candidate_time = candidate_observed_at(candidate)
+        except Exception:
+            continue
+        if candidate_time > feed_time + future_tolerance:
+            continue
+        if feed_time - candidate_time > max_age:
+            continue
+
         profile_id = candidate.get("destination_profile_id")
         profile = by_id.get(profile_id)
         if not profile:
@@ -89,16 +116,17 @@ def validate_feed(feed, config, whitelist):
             continue
         if candidate.get("direct") is not True:
             continue
-        if candidate.get("return_date") == "2026-10-02":
-            time_text = candidate.get("return_departure_time")
-            if not time_text:
-                continue
-            try:
-                hour, minute = (int(x) for x in time_text.split(":", 1))
-            except Exception:
-                continue
-            if hour >= 12 or hour < 0 or minute < 0 or minute > 59:
-                continue
+
+        time_text = candidate.get("return_departure_time")
+        if not time_text:
+            continue
+        try:
+            hour, minute = (int(x) for x in time_text.split(":", 1))
+        except Exception:
+            continue
+        if hour >= 12 or hour < 0 or minute < 0 or minute > 59:
+            continue
+
         if not isinstance(candidate.get("flight_total_ils"), (int, float)) or candidate["flight_total_ils"] <= 0:
             continue
         if not isinstance(candidate.get("hotel_total_ils"), (int, float)) or candidate["hotel_total_ils"] <= 0:
@@ -153,9 +181,14 @@ def baseline_for(history, key, component, now):
     return older[0][1], 1
 
 
-def detect_drops(valid_candidates, history, observed_at, threshold_pct):
+def detect_drops(valid_candidates, history, observed_at=None, threshold_pct=30):
     alerts = []
+    existing_ids = {row.get("observation_id") for row in history}
     for c in valid_candidates:
+        try:
+            candidate_time = candidate_observed_at(c)
+        except Exception:
+            continue
         keys = component_keys(c)
         components = {
             "flight": float(c["flight_total_ils"]),
@@ -163,12 +196,16 @@ def detect_drops(valid_candidates, history, observed_at, threshold_pct):
             "vacation": float(c["vacation_total_ils"]),
         }
         for component, current in components.items():
-            baseline, count = baseline_for(history, keys[component], component, observed_at)
+            obs_id = observation_id(c, keys[component], component)
+            if obs_id in existing_ids:
+                continue
+            baseline, count = baseline_for(history, keys[component], component, candidate_time)
             if baseline is None or baseline <= 0:
                 continue
             drop_pct = (baseline - current) / baseline * 100.0
             if drop_pct >= threshold_pct:
                 alerts.append({
+                    "observation_id": obs_id,
                     "stable_id": c.get("stable_id"),
                     "destination_profile_id": c["destination_profile_id"],
                     "destination": c["destination"],
@@ -186,7 +223,8 @@ def detect_drops(valid_candidates, history, observed_at, threshold_pct):
     return alerts
 
 
-def append_observations(valid_candidates, feed_verified_at, existing_history):
+def append_observations(valid_candidates, feed_verified_at=None, existing_history=None):
+    existing_history = existing_history or []
     existing_ids = {row.get("observation_id") for row in existing_history}
     rows = []
     for c in valid_candidates:
@@ -197,12 +235,13 @@ def append_observations(valid_candidates, feed_verified_at, existing_history):
             "vacation": c["vacation_total_ils"],
         }
         for component, price in prices.items():
-            observation_id = f"{feed_verified_at}|{keys[component]}|{component}"
-            if observation_id in existing_ids:
+            obs_id = observation_id(c, keys[component], component)
+            if obs_id in existing_ids:
                 continue
+            existing_ids.add(obs_id)
             rows.append({
-                "observation_id": observation_id,
-                "observed_at": feed_verified_at,
+                "observation_id": obs_id,
+                "observed_at": c["verified_at"],
                 "key": keys[component],
                 "component": component,
                 "price_ils": round(float(price), 2),
@@ -221,18 +260,38 @@ def append_observations(valid_candidates, feed_verified_at, existing_history):
 
 
 def rank_candidates(candidates):
-    def score(c):
-        family_value = c.get("family_value")
-        if isinstance(family_value, (int, float)):
-            return (0, -float(family_value), float(c["vacation_total_ils"]))
-        return (1, float(c["vacation_total_ils"]), 0)
+    if not candidates:
+        return []
 
-    ranked = sorted(candidates, key=score)[:3]
+    # Keep categories unique. Never manufacture three results when fewer than three verified candidates exist.
+    by_price = sorted(candidates, key=lambda c: float(c["vacation_total_ils"]))
+    with_value = [c for c in candidates if isinstance(c.get("family_value"), (int, float))]
+    best_value = max(with_value, key=lambda c: float(c["family_value"])) if with_value else by_price[0]
+    picks = [("BEST VALUE", best_value)]
+
+    cheapest = next((c for c in by_price if c is not best_value), None)
+    if cheapest is not None:
+        picks.append(("BEST PRICE", cheapest))
+
+    used = {id(c) for _, c in picks}
+    remaining = [c for c in candidates if id(c) not in used]
+    if remaining:
+        upgrade = max(
+            remaining,
+            key=lambda c: (
+                float(c.get("family_value") or 0),
+                float(c.get("stars") or 0),
+                float(c.get("guest_score") or 0),
+                -float(c["vacation_total_ils"]),
+            ),
+        )
+        picks.append(("SMART UPGRADE / SURPRISE", upgrade))
+
     result = []
-    for idx, c in enumerate(ranked, 1):
-        item = dict(c)
+    for idx, (category, candidate) in enumerate(picks[:3], 1):
+        item = dict(candidate)
         item["rank"] = idx
-        item["category"] = "BEST VERIFIED" if idx == 1 else "VERIFIED ALTERNATIVE"
+        item["category"] = category
         result.append(item)
     return result
 
@@ -266,17 +325,15 @@ def main():
     feed_verified_at = feed.get("verified_at")
     if not feed_verified_at:
         raise ValueError("provider feed is missing verified_at")
-    observed_at = parse_iso(feed_verified_at)
 
     valid_candidates = validate_feed(feed, config, whitelist)
     history_before = read_history()
     alerts = detect_drops(
         valid_candidates,
         history_before,
-        observed_at,
-        float(config.get("price_drop_threshold_pct", 30)),
+        threshold_pct=float(config.get("price_drop_threshold_pct", 30)),
     )
-    appended = append_observations(valid_candidates, feed_verified_at, history_before)
+    appended = append_observations(valid_candidates, existing_history=history_before)
 
     coverage = feed.get("scan_coverage", {})
     data = {
@@ -286,9 +343,12 @@ def main():
         "search": config,
         "automation": {
             "status": coverage.get("status", "unknown"),
-            "provider_mode": "hybrid-live-feed",
+            "provider_mode": "hybrid-sharded-live-feed",
             "last_attempt_at": feed_verified_at,
-            "last_verified_live_refresh": feed_verified_at if valid_candidates else None,
+            "last_verified_live_refresh": max(
+                (c.get("verified_at") for c in valid_candidates if c.get("verified_at")),
+                default=None,
+            ),
             "note": coverage.get("note", ""),
         },
         "scan_coverage": coverage,
@@ -300,7 +360,7 @@ def main():
     DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_alert(alerts)
     print(
-        f"processed feed {feed_verified_at}: {len(valid_candidates)} verified candidates, "
+        f"processed feed {feed_verified_at}: {len(valid_candidates)} fresh verified candidates, "
         f"{appended} new component observations, {len(alerts)} 30%+ alerts"
     )
     return 0
