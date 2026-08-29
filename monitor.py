@@ -1,8 +1,11 @@
 import json
 import statistics
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+from travel.collector import LiveCollector
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = ROOT / "travel" / "config.json"
@@ -324,6 +327,13 @@ def write_alert(alerts):
 
 
 def main():
+    skip_collect = "--no-collect" in sys.argv
+    collector_ran = False
+    if not skip_collect:
+        collector = LiveCollector(config_path=CONFIG, whitelist_path=WHITELIST, feed_path=FEED)
+        collector.collect()
+        collector_ran = True
+
     config = load_json(CONFIG)
     whitelist = load_json(WHITELIST)
     feed = load_json(FEED)
@@ -348,7 +358,7 @@ def main():
         "search": config,
         "automation": {
             "status": coverage.get("status", "unknown"),
-            "provider_mode": "feed-processing-only-no-live-collector",
+            "provider_mode": "live-collector-and-processor" if collector_ran else "feed-processing-only-no-live-collector",
             "last_attempt_at": feed_verified_at,
             "last_verified_live_refresh": max(
                 (c.get("verified_at") for c in valid_candidates if c.get("verified_at")),
