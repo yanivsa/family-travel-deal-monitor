@@ -1,0 +1,25 @@
+name: Gmail Alert E2E Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/email-e2e-once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  gmail-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Send one-time Gmail TEST
+        env:
+          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+        run: python scripts/send_gmail_alert.py --test
