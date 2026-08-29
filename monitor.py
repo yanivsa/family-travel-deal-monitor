@@ -263,7 +263,6 @@ def rank_candidates(candidates):
     if not candidates:
         return []
 
-    # Keep categories unique. Never manufacture three results when fewer than three verified candidates exist.
     by_price = sorted(candidates, key=lambda c: float(c["vacation_total_ils"]))
     with_value = [c for c in candidates if isinstance(c.get("family_value"), (int, float))]
     best_value = max(with_value, key=lambda c: float(c["family_value"])) if with_value else by_price[0]
@@ -343,7 +342,7 @@ def main():
         "search": config,
         "automation": {
             "status": coverage.get("status", "unknown"),
-            "provider_mode": "hybrid-sharded-live-feed",
+            "provider_mode": "feed-processing-only-no-live-collector",
             "last_attempt_at": feed_verified_at,
             "last_verified_live_refresh": max(
                 (c.get("verified_at") for c in valid_candidates if c.get("verified_at")),
