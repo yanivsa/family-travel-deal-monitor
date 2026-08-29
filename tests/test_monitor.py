@@ -1,0 +1,152 @@
+from copy import deepcopy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+import monitor
+
+TZ = ZoneInfo("Asia/Jerusalem")
+
+
+def load_contract():
+    return monitor.load_json(monitor.CONFIG), monitor.load_json(monitor.WHITELIST)
+
+
+def valid_candidate(return_date="2026-10-01", return_time="16:00"):
+    return {
+        "stable_id": "fixture-1",
+        "destination_profile_id": "cy-larnaca",
+        "destination": "Larnaca",
+        "country": "Cyprus",
+        "gateway_iata": "LCA",
+        "origin": "TLV",
+        "departure_date": "2026-09-27",
+        "return_date": return_date,
+        "return_departure_time": return_time,
+        "direct": True,
+        "airline": "Fixture Air",
+        "flight_total_ils": 5000.0,
+        "baggage": "Cabin bag only",
+        "flight_url": "https://example.test/flight",
+        "hotel": "Fixture Family Hotel",
+        "stars": 4,
+        "guest_score": 8.5,
+        "rooms": 1,
+        "hotel_total_ils": 4000.0,
+        "hotel_url": "https://example.test/hotel",
+        "vacation_total_ils": 9000.0,
+        "verified": True,
+        "verified_at": "2026-08-29T22:00:00+03:00",
+        "source_provenance": ["fixture"],
+    }
+
+
+def feed_with(candidate):
+    config, whitelist = load_contract()
+    return {
+        "verified_at": "2026-08-29T22:00:00+03:00",
+        "config": {
+            "origin": config["origin"],
+            "departure_date": config["departure_date"],
+            "return_dates": config["return_dates"],
+            "direct_only": True,
+            "party": config["party"],
+        },
+        "scan_coverage": {
+            "whitelist_profiles": len(whitelist),
+            "unique_gateways_total": len({x["gateway_iata"] for x in whitelist}),
+            "gateways_live_checked_this_run": ["LCA"],
+        },
+        "provider_health": {},
+        "candidates": [candidate],
+    }
+
+
+def test_whitelist_contract_is_exactly_64_profiles_and_43_gateways():
+    _, whitelist = load_contract()
+    assert len(whitelist) == 64
+    assert len({item["gateway_iata"] for item in whitelist}) == 43
+    ayia = next(x for x in whitelist if x["id"] == "cy-ayia-napa")
+    assert ayia["gateway_iata"] == "LCA"
+
+
+def test_current_date_and_direct_contract():
+    config, _ = load_contract()
+    assert config["departure_date"] == "2026-09-27"
+    assert config["return_dates"] == ["2026-10-01", "2026-10-02"]
+    assert config["return_2026_10_02_morning_only"] is True
+    assert config["direct_only"] is True
+    assert config["party"] == {"adults": 2, "children_ages": [10, 7, 2]}
+    assert config["price_drop_threshold_pct"] == 30
+
+
+def test_valid_direct_candidate_is_accepted():
+    config, whitelist = load_contract()
+    candidate = valid_candidate()
+    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == [candidate]
+
+
+def test_departure_28_september_is_rejected():
+    config, whitelist = load_contract()
+    candidate = valid_candidate()
+    candidate["departure_date"] = "2026-09-28"
+    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == []
+
+
+def test_connection_is_rejected():
+    config, whitelist = load_contract()
+    candidate = valid_candidate()
+    candidate["direct"] = False
+    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == []
+
+
+def test_october_2_noon_or_later_is_rejected():
+    config, whitelist = load_contract()
+    candidate = valid_candidate(return_date="2026-10-02", return_time="12:00")
+    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == []
+
+
+def test_october_2_morning_is_accepted():
+    config, whitelist = load_contract()
+    candidate = valid_candidate(return_date="2026-10-02", return_time="11:59")
+    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == [candidate]
+
+
+def history_for(candidate, component, baseline):
+    keys = monitor.component_keys(candidate)
+    return [{
+        "observed_at": "2026-08-28T10:00:00+03:00",
+        "key": keys[component],
+        "component": component,
+        "price_ils": baseline,
+    }]
+
+
+def test_29_9_percent_drop_does_not_alert():
+    candidate = valid_candidate()
+    candidate["flight_total_ils"] = 70.1
+    candidate["vacation_total_ils"] = 4070.1
+    alerts = monitor.detect_drops(
+        [candidate], history_for(candidate, "flight", 100.0),
+        datetime(2026, 8, 29, 22, tzinfo=TZ), 30.0
+    )
+    assert not [a for a in alerts if a["component"] == "flight"]
+
+
+def test_exact_30_percent_drop_alerts():
+    candidate = valid_candidate()
+    candidate["flight_total_ils"] = 70.0
+    candidate["vacation_total_ils"] = 4070.0
+    alerts = monitor.detect_drops(
+        [candidate], history_for(candidate, "flight", 100.0),
+        datetime(2026, 8, 29, 22, tzinfo=TZ), 30.0
+    )
+    flight_alerts = [a for a in alerts if a["component"] == "flight"]
+    assert len(flight_alerts) == 1
+    assert flight_alerts[0]["drop_pct"] == 30.0
+
+
+def test_component_history_keys_are_independent():
+    candidate = valid_candidate()
+    keys = monitor.component_keys(candidate)
+    assert keys["flight"] != keys["hotel"] != keys["vacation"]
+    assert keys["flight"].endswith("|direct")
