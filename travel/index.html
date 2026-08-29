@@ -10,7 +10,7 @@
 <body><div class="wrap">
 <section class="hero">
 <h1>מוניטור נפילות מחיר משפחתי — סוכות 2026</h1>
-<div class="muted">2 מבוגרים + 3 ילדים · יציאה TLV ב־27.9.2026 · חזרה 2.10.2026 לפני 12:00 · טיסות ישירות בלבד · 64 יעדים משפחתיים באירופה</div>
+<div id="scope" class="muted">טוען את היקף החיפוש העדכני…</div>
 <div id="status" class="status"></div>
 </section>
 <div id="alerts"></div>
@@ -22,10 +22,14 @@
 <script>
 const ils=n=>n==null?'—':new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0}).format(n);
 const safe=v=>v==null?'—':String(v);
+const heDate=s=>{if(!s)return '—';const [y,m,d]=String(s).split('-');return `${Number(d)}.${Number(m)}.${y}`};
 fetch('./data.json?ts='+Date.now()).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(d=>{
- const a=d.automation||{}, c=d.scan_coverage||{}, deals=d.deals||[], alerts=d.price_drop_alerts||[];
+ const a=d.automation||{}, c=d.scan_coverage||{}, deals=d.deals||[], alerts=d.price_drop_alerts||[], s=d.search||{};
  const fresh=(c.gateways_fresh_within_90m||c.gateways_live_checked_this_run||[]);
  const current=(c.gateways_live_checked_this_run||[]);
+ const returns=(s.return_dates||[]).map((x,i)=>`${heDate(x)}${x==='2026-10-02'&&s.return_2026_10_02_morning_only?' לפני 12:00':''}`).join(' או ');
+ const kids=((s.party||{}).children_ages||[]).length;
+ document.getElementById('scope').textContent=`${safe((s.party||{}).adults)} מבוגרים + ${kids} ילדים · יציאה ${safe(s.origin)} ב־${heDate(s.departure_date)} · חזרה ${returns||'—'} · ${s.direct_only?'טיסות ישירות בלבד':'טיסות'} · ${safe(c.whitelist_profiles)} יעדים משפחתיים באירופה`;
  document.getElementById('status').innerHTML=`<span class="pill">סטטוס: ${safe(a.status)}</span><span class="pill">מצב: ${safe(a.provider_mode)}</span><span class="pill">אימות חי אחרון: ${safe(a.last_verified_live_refresh)}</span>`;
  document.getElementById('coverage').textContent=`כיסוי טרי ב־90 הדקות האחרונות: ${fresh.length} מתוך ${safe(c.unique_gateways_total)} gateways · בסבב האחרון נבדקו ${current.length} · ${safe(c.whitelist_profiles)} פרופילי יעד. ${safe(c.note)}`;
  document.getElementById('providers').innerHTML=Object.entries(d.provider_health||{}).map(([name,v])=>`<div class="provider"><b>${name}</b> · <span class="${v.status==='ok'?'ok':(v.status==='degraded'?'bad':'')}">${safe(v.status)}</span><br><span class="muted">${safe(v.message)}</span></div>`).join('') || '<div class="muted">אין נתוני provider health.</div>';
