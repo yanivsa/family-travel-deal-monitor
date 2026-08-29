@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T22:41:12.538318+03:00",
+  "generated_at": "2026-08-29T22:47:43.647905+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
@@ -42,7 +42,7 @@
   },
   "automation": {
     "status": "degraded",
-    "provider_mode": "hybrid-sharded-live-feed",
+    "provider_mode": "feed-processing-only-no-live-collector",
     "last_attempt_at": "2026-08-29T22:10:33+03:00",
     "last_verified_live_refresh": "2026-08-29T22:10:33+03:00",
     "note": "Only LCA completed end-to-end in this baseline run (1 of 48 unique gateways). The collector must refresh all 48 gateways for the single hard window 2026-09-27 -> 2026-10-02 morning."
