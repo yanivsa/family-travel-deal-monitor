@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-30T00:07:25.040633+03:00",
+  "generated_at": "2026-08-30T01:06:14.329075+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
@@ -46,7 +46,7 @@
     "provider_mode": "feed-processing-only-no-live-collector",
     "last_attempt_at": "2026-08-29T22:10:33+03:00",
     "last_verified_live_refresh": "2026-08-29T22:10:33+03:00",
-    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
+    "note": "Baseline evidence covers LCA. Automated live collection across all 48 gateways is blocked pending official API credentials/tokens for flight and hotel search providers."
   },
   "scan_coverage": {
     "whitelist_profiles": 64,
@@ -55,32 +55,32 @@
       "LCA"
     ],
     "status": "degraded",
-    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
+    "note": "Baseline evidence covers LCA. Automated live collection across all 48 gateways is blocked pending official API credentials/tokens for flight and hotel search providers."
   },
   "provider_health": {
     "World Airfares": {
-      "status": "ok",
-      "message": "A live direct round-trip baseline exists for LCA; full 48-gateway coverage and both allowed return windows remain required."
+      "status": "degraded",
+      "message": "A live direct round-trip baseline exists for LCA; full 48-gateway live API collection is blocked due to missing API key/credential in GitHub Actions secrets."
     },
     "Booking.com": {
-      "status": "ok",
-      "message": "A live family hotel baseline exists for Larnaca; full destination coverage remains required."
+      "status": "degraded",
+      "message": "A live family hotel baseline exists for Larnaca; automated 48-gateway live search is blocked due to missing RapidAPI/Booking affiliate API key in secrets."
     },
     "eDreams": {
-      "status": "degraded",
-      "message": "No normalized all-passenger fare or verified package total is retained in this baseline feed."
+      "status": "unsupported",
+      "message": "No API credentials or official bridge configured for direct eDreams live price ingestion."
     },
     "BreckenWander": {
-      "status": "degraded",
-      "message": "No independently normalized package total is retained in this baseline feed."
+      "status": "unsupported",
+      "message": "No API credentials or official bridge configured for BreckenWander live search."
     },
     "Skyscanner": {
       "status": "unsupported",
-      "message": "No reproducible normalized result is retained in this baseline feed."
+      "message": "No Skyscanner API key / partner token configured in GitHub secrets for live search."
     },
     "Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages": {
       "status": "not_configured",
-      "message": "No reliable structured package connector is configured in this baseline feed."
+      "message": "No authorized package API credentials or structured scrapers configured in GitHub secrets."
     }
   },
   "price_drop_alerts": [],
