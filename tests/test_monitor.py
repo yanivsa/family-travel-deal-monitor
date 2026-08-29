@@ -80,7 +80,7 @@ def test_current_provider_feed_coverage_metadata_matches_whitelist():
 def test_current_date_and_direct_contract():
     config, _ = load_contract()
     assert config["departure_date"] == "2026-09-27"
-    assert config["return_dates"] == ["2026-10-02"]
+    assert config["return_dates"] == ["2026-10-01", "2026-10-02"]
     assert config["return_2026_10_02_morning_only"] is True
     assert config["direct_only"] is True
     assert config["party"] == {"adults": 2, "children_ages": [10, 7, 2]}
@@ -101,10 +101,10 @@ def test_departure_28_september_is_rejected():
     assert monitor.validate_feed(feed_with(candidate), config, whitelist) == []
 
 
-def test_october_1_is_rejected():
+def test_october_1_afternoon_is_accepted():
     config, whitelist = load_contract()
     candidate = valid_candidate(return_date="2026-10-01", return_time="16:00")
-    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == []
+    assert monitor.validate_feed(feed_with(candidate), config, whitelist) == [candidate]
 
 
 def test_connection_is_rejected():
