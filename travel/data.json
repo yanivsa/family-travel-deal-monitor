@@ -1,12 +1,11 @@
 {
-  "generated_at": "2026-08-29T22:31:32.365732+03:00",
+  "generated_at": "2026-08-29T22:38:44.691681+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
     "origin": "TLV",
     "departure_date": "2026-09-27",
     "return_dates": [
-      "2026-10-01",
       "2026-10-02"
     ],
     "return_2026_10_02_morning_only": true,
@@ -45,7 +44,7 @@
     "provider_mode": "hybrid-live-feed",
     "last_attempt_at": "2026-08-29T22:10:33+03:00",
     "last_verified_live_refresh": "2026-08-29T22:10:33+03:00",
-    "note": "Only LCA completed end-to-end in this run (1 of 48 unique gateways); feed records only independently verified candidates and does not claim full-market coverage."
+    "note": "Only LCA completed end-to-end in this baseline run (1 of 48 unique gateways). The collector must refresh all 48 gateways for the single hard window 2026-09-27 -> 2026-10-02 morning."
   },
   "scan_coverage": {
     "whitelist_profiles": 64,
@@ -54,80 +53,37 @@
       "LCA"
     ],
     "status": "degraded",
-    "note": "Only LCA completed end-to-end in this run (1 of 48 unique gateways); feed records only independently verified candidates and does not claim full-market coverage."
+    "note": "Only LCA completed end-to-end in this baseline run (1 of 48 unique gateways). The collector must refresh all 48 gateways for the single hard window 2026-09-27 -> 2026-10-02 morning."
   },
   "provider_health": {
     "World Airfares": {
       "status": "ok",
-      "message": "Live direct round-trip searches completed for LCA for both allowed return dates."
+      "message": "Live direct round-trip search completed for LCA for the only allowed window, 27 Sep -> 2 Oct morning."
     },
     "Booking.com": {
       "status": "ok",
-      "message": "Live 4–5 star hotel searches completed for Larnaca for both allowed stays with 2 adults + children ages 10,7,2."
+      "message": "Live 5-star family hotel search completed for Larnaca for 27 Sep -> 2 Oct with 2 adults + children ages 10,7,2."
     },
     "eDreams": {
-      "status": "ok",
-      "message": "Live TLV-LCA 27 Sep–1 Oct search cross-checked Aegean direct schedule; fare amount not used because all-passenger price semantics were not sufficiently clear for normalization."
+      "status": "degraded",
+      "message": "No normalized all-passenger fare was retained for the hard window in this baseline run."
     },
     "BreckenWander": {
-      "status": "ok",
-      "message": "Live direct TLV-LCA search found package-only flight quotes; not used as standalone total because hotel must be added and return selection is deferred to booking."
+      "status": "degraded",
+      "message": "No independently normalized package total was retained for the hard window in this baseline run."
     },
     "Skyscanner": {
       "status": "unsupported",
-      "message": "Connector contract requires its live-price call to be the final action in the turn, which is incompatible with the required subsequent GitHub feed write in this run."
+      "message": "Connector execution constraints prevented safe use before the GitHub feed write in this baseline run."
     },
     "Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages": {
       "status": "not_configured",
-      "message": "No reliable structured package connector was available in this run."
+      "message": "No reliable structured package connector was available in this baseline run."
     }
   },
   "price_drop_alerts": [],
   "history_observations_added": 0,
   "deals": [
-    {
-      "stable_id": "cy-larnaca|2026-09-27|2026-10-01|A3-3527-3526|booking-298238",
-      "destination_profile_id": "cy-larnaca",
-      "destination": "Larnaca",
-      "country": "Cyprus",
-      "gateway_iata": "LCA",
-      "origin": "TLV",
-      "departure_date": "2026-09-27",
-      "return_date": "2026-10-01",
-      "return_departure_time": "06:15",
-      "direct": true,
-      "airline": "Aegean Airlines",
-      "flight_total_ils": 5333.65,
-      "flight_original": {
-        "amount": 1320.5,
-        "currency": "GBP",
-        "fx_rate_gbp_ils": 4.03911
-      },
-      "baggage": "Cabin bag only",
-      "flight_url": "https://mcp.worldairfares.com/r/Z7fdUEa7",
-      "hotel": "Sandy Beach Hotel & Spa",
-      "stars": 5,
-      "guest_score": 8.8,
-      "rooms": 1,
-      "hotel_total_ils": 4830,
-      "hotel_url": "https://www.booking.com/hotel/cy/sandy-beach.html?aid=2438770&checkin=2026-09-27&checkout=2026-10-01&no_rooms=1&group_adults=2&group_children=3&age=10&age=7&age=2&selected_currency=ILS",
-      "package_total_ils": null,
-      "package_url": null,
-      "mandatory_fees_ils": null,
-      "vacation_total_ils": 10163.65,
-      "family_value": null,
-      "effective_vacation_hours": 79.5,
-      "verified": true,
-      "verified_at": "2026-08-29T22:10:33+03:00",
-      "source_provenance": [
-        "World Airfares live",
-        "Booking.com live",
-        "eDreams schedule cross-check",
-        "live GBP/ILS FX"
-      ],
-      "rank": 1,
-      "category": "BEST VERIFIED"
-    },
     {
       "stable_id": "cy-larnaca|2026-09-27|2026-10-02|IZ-unknown|booking-298238",
       "destination_profile_id": "cy-larnaca",
@@ -167,8 +123,8 @@
         "Booking.com live",
         "live GBP/ILS FX"
       ],
-      "rank": 2,
-      "category": "VERIFIED ALTERNATIVE"
+      "rank": 1,
+      "category": "BEST VERIFIED"
     }
   ]
 }
