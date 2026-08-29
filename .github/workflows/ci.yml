@@ -26,4 +26,6 @@ jobs:
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
       - name: Run contract tests
+        env:
+          PYTHONPATH: .
         run: pytest -q
