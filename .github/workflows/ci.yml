@@ -8,6 +8,7 @@ on:
       - 'monitor.py'
       - 'travel/config.json'
       - 'travel/destination_whitelist.json'
+      - 'travel/provider-feed.json'
       - 'travel/skills.json'
       - 'tests/**'
       - '.github/workflows/ci.yml'
