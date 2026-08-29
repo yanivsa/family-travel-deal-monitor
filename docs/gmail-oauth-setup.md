@@ -11,8 +11,9 @@ No Google account password or Gmail App Password is stored in GitHub.
 1. Create or select a Google Cloud project.
 2. Enable the Gmail API.
 3. Configure Google Auth Platform / OAuth consent for the Gmail account that will send alerts.
-4. Create an OAuth Client ID of type **Desktop app**.
-5. Run locally:
+4. **Do not leave an external OAuth app in Testing for production use.** Google refresh tokens for external apps in Testing normally expire after 7 days. Set the app to **Production** before creating the long-lived production grant, or use **Internal** when appropriate for a Google Workspace organization.
+5. Create an OAuth Client ID of type **Desktop app**.
+6. Run locally:
 
 ```bash
 python scripts/gmail_oauth_bootstrap.py \
@@ -20,8 +21,8 @@ python scripts/gmail_oauth_bootstrap.py \
   --client-secret '<CLIENT_SECRET>'
 ```
 
-6. Sign in to Google in the browser and grant only Gmail send permission.
-7. The helper prints a refresh token. Do not commit or share it.
+7. Sign in to Google in the browser and grant only Gmail send permission.
+8. The helper prints a refresh token. Do not commit or share it.
 
 ## GitHub Actions secrets
 
