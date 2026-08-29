@@ -1,0 +1,17 @@
+{
+  "origin": "TLV",
+  "departure_date": "2026-09-27",
+  "return_dates": ["2026-10-01", "2026-10-02"],
+  "return_2026_10_02_morning_only": true,
+  "party": {"adults": 2, "children_ages": [10,7,2]},
+  "region": "Europe",
+  "direct_only": true,
+  "excluded_countries": ["Turkey"],
+  "excluded_regions": ["Arab states"],
+  "hotel": {"min_stars": 4, "family_friendly": true},
+  "price_drop_threshold_pct": 30,
+  "primary_flight_provider": "World Airfares",
+  "primary_hotel_provider": "Booking.com",
+  "secondary_providers": ["Skyscanner","eDreams","BreckenWander"],
+  "feed_path": "travel/provider-feed.json"
+}
