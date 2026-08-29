@@ -2,6 +2,12 @@ name: Process Family Travel Provider Feed
 
 on:
   workflow_dispatch:
+    inputs:
+      email_test:
+        description: 'Send a Gmail delivery TEST (requires GMAIL_USERNAME and GMAIL_APP_PASSWORD secrets)'
+        required: false
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -9,6 +15,7 @@ on:
       - 'travel/config.json'
       - 'travel/destination_whitelist.json'
       - 'monitor.py'
+      - 'scripts/send_gmail_alert.py'
       - '.github/workflows/travel-monitor.yml'
 
 permissions:
@@ -31,6 +38,30 @@ jobs:
           python-version: '3.12'
       - name: Validate feed, persist component history, detect 30% drops, build dashboard data
         run: python monitor.py
+
+      - name: Send Gmail delivery TEST
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.email_test }}
+        env:
+          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+        run: python scripts/send_gmail_alert.py --test
+
+      - name: Send Gmail alert for verified 30%+ price drop
+        id: gmail_alert
+        if: ${{ hashFiles('travel/alert.md') != '' && !(github.event_name == 'workflow_dispatch' && inputs.email_test) }}
+        continue-on-error: true
+        env:
+          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+        run: python scripts/send_gmail_alert.py --alert travel/alert.md
+
+      - name: Record Gmail delivery failure in alert evidence
+        if: ${{ steps.gmail_alert.outcome == 'failure' }}
+        run: |
+          printf '\n\n⚠️ Gmail delivery failed in GitHub Actions. Check GMAIL_USERNAME/GMAIL_APP_PASSWORD and the workflow logs. Dashboard/history processing continued.\n' >> travel/alert.md
+
       - name: Commit processed data and history
         run: |
           git config user.name "travel-monitor-bot"
@@ -42,6 +73,7 @@ jobs:
             git commit -m "chore(travel): process live provider feed"
             git push
           fi
+
       - name: Create or update GitHub alert issue
         if: hashFiles('travel/alert.md') != ''
         env:
@@ -82,6 +114,5 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# Live provider collection is intentionally not claimed by this workflow yet.
-# The processor accepts only verified provider-feed input and reports degraded/no-live-collector otherwise.
-# Final production email delivery must also have a successful E2E test before it is considered complete.
+# Live provider collection must be independently verified; this workflow never treats a green processor as proof of full-market live coverage.
+# Gmail production delivery is considered complete only after workflow_dispatch(email_test=true) succeeds end-to-end.

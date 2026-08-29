@@ -6,12 +6,14 @@ on:
     branches: [main]
     paths:
       - 'monitor.py'
+      - 'scripts/send_gmail_alert.py'
       - 'travel/config.json'
       - 'travel/destination_whitelist.json'
       - 'travel/provider-feed.json'
       - 'travel/skills.json'
       - 'tests/**'
       - '.github/workflows/ci.yml'
+      - '.github/workflows/travel-monitor.yml'
 
 permissions:
   contents: read

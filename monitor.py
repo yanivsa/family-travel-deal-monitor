@@ -124,7 +124,13 @@ def validate_feed(feed, config, whitelist):
             hour, minute = (int(x) for x in time_text.split(":", 1))
         except Exception:
             continue
-        if hour >= 12 or hour < 0 or minute < 0 or minute > 59:
+        if hour < 0 or hour > 23 or minute < 0 or minute > 59:
+            continue
+        if (
+            candidate.get("return_date") == "2026-10-02"
+            and config.get("return_2026_10_02_morning_only") is True
+            and hour >= 12
+        ):
             continue
 
         if not isinstance(candidate.get("flight_total_ils"), (int, float)) or candidate["flight_total_ils"] <= 0:
