@@ -24,6 +24,16 @@ jobs:
       - name: Run monitor
         env:
           TRAVEL_PROVIDER_JSON_URL: ${{ secrets.TRAVEL_PROVIDER_JSON_URL }}
+          WORLD_AIRFARES_API_KEY: ${{ secrets.WORLD_AIRFARES_API_KEY }}
+          WORLD_AIRFARES_ENDPOINT: ${{ secrets.WORLD_AIRFARES_ENDPOINT }}
+          BOOKING_COM_API_KEY: ${{ secrets.BOOKING_COM_API_KEY }}
+          BOOKING_COM_ENDPOINT: ${{ secrets.BOOKING_COM_ENDPOINT }}
+          SKYSCANNER_API_KEY: ${{ secrets.SKYSCANNER_API_KEY }}
+          SKYSCANNER_ENDPOINT: ${{ secrets.SKYSCANNER_ENDPOINT }}
+          EDREAMS_API_KEY: ${{ secrets.EDREAMS_API_KEY }}
+          EDREAMS_ENDPOINT: ${{ secrets.EDREAMS_ENDPOINT }}
+          BRECKENWANDER_API_KEY: ${{ secrets.BRECKENWANDER_API_KEY }}
+          BRECKENWANDER_ENDPOINT: ${{ secrets.BRECKENWANDER_ENDPOINT }}
         run: python monitor.py
       - name: Commit refreshed data
         run: |
