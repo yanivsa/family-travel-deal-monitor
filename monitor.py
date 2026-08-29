@@ -60,7 +60,12 @@ def validate_feed(feed, config, whitelist):
         raise ValueError("feed party does not match config")
 
     known_gateways = {item["gateway_iata"] for item in whitelist}
-    checked = set(feed.get("scan_coverage", {}).get("gateways_live_checked_this_run", []))
+    coverage = feed.get("scan_coverage", {})
+    if coverage.get("whitelist_profiles") != len(whitelist):
+        raise ValueError("feed whitelist profile count does not match repository whitelist")
+    if coverage.get("unique_gateways_total") != len(known_gateways):
+        raise ValueError("feed unique gateway count does not match repository whitelist")
+    checked = set(coverage.get("gateways_live_checked_this_run", []))
     if not checked.issubset(known_gateways):
         raise ValueError("feed claims an unknown gateway in scan coverage")
 
