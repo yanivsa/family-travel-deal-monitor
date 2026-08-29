@@ -10,10 +10,10 @@
   },
   "scan_coverage": {
     "whitelist_profiles": 64,
-    "unique_gateways_total": 43,
+    "unique_gateways_total": 48,
     "gateways_live_checked_this_run": ["LCA"],
     "status": "degraded",
-    "note": "Only LCA completed end-to-end in this run; feed records only independently verified candidates and does not claim full-market coverage."
+    "note": "Only LCA completed end-to-end in this run (1 of 48 unique gateways); feed records only independently verified candidates and does not claim full-market coverage."
   },
   "provider_health": {
     "World Airfares": {"status":"ok","message":"Live direct round-trip searches completed for LCA for both allowed return dates."},
