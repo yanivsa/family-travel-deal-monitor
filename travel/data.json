@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-08-29T22:49:36.585385+03:00",
+  "generated_at": "2026-08-29T23:01:26.287747+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
     "origin": "TLV",
     "departure_date": "2026-09-27",
     "return_dates": [
+      "2026-10-01",
       "2026-10-02"
     ],
     "return_2026_10_02_morning_only": true,
@@ -45,7 +46,7 @@
     "provider_mode": "feed-processing-only-no-live-collector",
     "last_attempt_at": "2026-08-29T22:10:33+03:00",
     "last_verified_live_refresh": "2026-08-29T22:10:33+03:00",
-    "note": "Only LCA completed end-to-end in this baseline run (1 of 48 unique gateways). The collector must refresh all 48 gateways for the single hard window 2026-09-27 -> 2026-10-02 morning."
+    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
   },
   "scan_coverage": {
     "whitelist_profiles": 64,
@@ -54,32 +55,32 @@
       "LCA"
     ],
     "status": "degraded",
-    "note": "Only LCA completed end-to-end in this baseline run (1 of 48 unique gateways). The collector must refresh all 48 gateways for the single hard window 2026-09-27 -> 2026-10-02 morning."
+    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
   },
   "provider_health": {
     "World Airfares": {
       "status": "ok",
-      "message": "Live direct round-trip search completed for LCA for the only allowed window, 27 Sep -> 2 Oct morning."
+      "message": "A live direct round-trip baseline exists for LCA; full 48-gateway coverage and both allowed return windows remain required."
     },
     "Booking.com": {
       "status": "ok",
-      "message": "Live 5-star family hotel search completed for Larnaca for 27 Sep -> 2 Oct with 2 adults + children ages 10,7,2."
+      "message": "A live family hotel baseline exists for Larnaca; full destination coverage remains required."
     },
     "eDreams": {
       "status": "degraded",
-      "message": "No normalized all-passenger fare was retained for the hard window in this baseline run."
+      "message": "No normalized all-passenger fare or verified package total is retained in this baseline feed."
     },
     "BreckenWander": {
       "status": "degraded",
-      "message": "No independently normalized package total was retained for the hard window in this baseline run."
+      "message": "No independently normalized package total is retained in this baseline feed."
     },
     "Skyscanner": {
       "status": "unsupported",
-      "message": "Connector execution constraints prevented safe use before the GitHub feed write in this baseline run."
+      "message": "No reproducible normalized result is retained in this baseline feed."
     },
     "Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages": {
       "status": "not_configured",
-      "message": "No reliable structured package connector was available in this baseline run."
+      "message": "No reliable structured package connector is configured in this baseline feed."
     }
   },
   "price_drop_alerts": [],
