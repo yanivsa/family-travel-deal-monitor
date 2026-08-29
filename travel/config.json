@@ -10,6 +10,7 @@
   "excluded_regions": ["Arab states"],
   "hotel": {"min_stars": 4, "family_friendly": true},
   "price_drop_threshold_pct": 30,
+  "max_candidate_age_minutes": 90,
   "primary_flight_provider": "World Airfares",
   "primary_hotel_provider": "Booking.com",
   "secondary_providers": ["Skyscanner","eDreams","BreckenWander"],
