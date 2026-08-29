@@ -1,0 +1,41 @@
+{
+  "skills": [
+    {
+      "name": "israeli-flight-finder",
+      "source": "https://raw.githubusercontent.com/skills-il/travel/master/israeli-flight-finder/SKILL.md",
+      "required": true,
+      "purpose": "Israel/TLV-specific live flight comparison, baggage and anti-fabrication rules"
+    },
+    {
+      "name": "israeli-abroad-trip-planner",
+      "source": "https://raw.githubusercontent.com/skills-il/travel/master/israeli-abroad-trip-planner/SKILL.md",
+      "required": true,
+      "purpose": "Israeli family abroad planning and destination suitability"
+    },
+    {
+      "name": "destination-compare",
+      "source": "https://raw.githubusercontent.com/mtnrabi/travel-agent-skills/main/skills/destination-compare/SKILL.md",
+      "required": true,
+      "purpose": "Coverage-aware comparison of many destinations from one origin"
+    },
+    {
+      "name": "fare-watch",
+      "source": "https://raw.githubusercontent.com/mtnrabi/travel-agent-skills/main/skills/fare-watch/SKILL.md",
+      "required": true,
+      "purpose": "Repeated price observations, historical comparison and meaningful price-drop detection"
+    },
+    {
+      "name": "hotel-search",
+      "source": "https://raw.githubusercontent.com/mtnrabi/travel-agent-skills/main/skills/hotel-search/SKILL.md",
+      "required": true,
+      "purpose": "Live hotel search and normalized hotel comparison"
+    },
+    {
+      "name": "rate-parity-monitor",
+      "source": "https://raw.githubusercontent.com/mtnrabi/travel-agent-skills/main/skills/rate-parity-monitor/SKILL.md",
+      "required": false,
+      "purpose": "Optional hotel price anomaly/parity check when a supported live source exists"
+    }
+  ],
+  "policy": "Repository travel/config.json rules override any conflicting skill rule. Skills guide search/normalization; only verified live provider data may create prices or alerts."
+}
