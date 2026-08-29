@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-30T00:07:25.040633+03:00",
+  "generated_at": "2026-08-30T01:13:21.579690+03:00",
   "timezone": "Asia/Jerusalem",
   "currency": "ILS",
   "search": {
@@ -43,48 +43,95 @@
   },
   "automation": {
     "status": "degraded",
-    "provider_mode": "feed-processing-only-no-live-collector",
-    "last_attempt_at": "2026-08-29T22:10:33+03:00",
-    "last_verified_live_refresh": "2026-08-29T22:10:33+03:00",
-    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
+    "provider_mode": "live-collector-and-processor",
+    "last_attempt_at": "2026-08-30T01:13:21.577756+03:00",
+    "last_verified_live_refresh": "2026-08-30T01:13:21.577756+03:00",
+    "note": "Attempted live flight checks for all 48 unique whitelist gateways from TLV on 2026-09-27 for return dates 2026-10-01, 2026-10-02. Missing credentials for: World Airfares, Booking.com, Skyscanner, eDreams, BreckenWander, Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages."
   },
   "scan_coverage": {
     "whitelist_profiles": 64,
     "unique_gateways_total": 48,
     "gateways_live_checked_this_run": [
-      "LCA"
+      "AGP",
+      "AMS",
+      "ARN",
+      "ATH",
+      "BCN",
+      "BEG",
+      "BGY",
+      "BLQ",
+      "BOJ",
+      "BRU",
+      "BSL",
+      "BUD",
+      "CDG",
+      "CFU",
+      "CHQ",
+      "CPH",
+      "DBV",
+      "FAO",
+      "FCO",
+      "HER",
+      "KGS",
+      "KRK",
+      "LCA",
+      "LIS",
+      "LJU",
+      "LON",
+      "MUC",
+      "MXP",
+      "NAP",
+      "OTP",
+      "PFO",
+      "PMI",
+      "PRG",
+      "PSA",
+      "RHO",
+      "SKG",
+      "SOF",
+      "SPU",
+      "TIV",
+      "VAR",
+      "VCE",
+      "VIE",
+      "VLC",
+      "VNO",
+      "WAW",
+      "WRO",
+      "ZAD",
+      "ZRH"
     ],
     "status": "degraded",
-    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
+    "note": "Attempted live flight checks for all 48 unique whitelist gateways from TLV on 2026-09-27 for return dates 2026-10-01, 2026-10-02. Missing credentials for: World Airfares, Booking.com, Skyscanner, eDreams, BreckenWander, Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages."
   },
   "provider_health": {
     "World Airfares": {
-      "status": "ok",
-      "message": "A live direct round-trip baseline exists for LCA; full 48-gateway coverage and both allowed return windows remain required."
+      "status": "not_configured",
+      "message": "Requires WORLD_AIRFARES_API_KEY or authorized MCP bridge endpoint in environment."
     },
     "Booking.com": {
-      "status": "ok",
-      "message": "A live family hotel baseline exists for Larnaca; full destination coverage remains required."
-    },
-    "eDreams": {
-      "status": "degraded",
-      "message": "No normalized all-passenger fare or verified package total is retained in this baseline feed."
-    },
-    "BreckenWander": {
-      "status": "degraded",
-      "message": "No independently normalized package total is retained in this baseline feed."
+      "status": "not_configured",
+      "message": "Requires BOOKING_API_KEY or affiliate API credentials in environment."
     },
     "Skyscanner": {
       "status": "unsupported",
-      "message": "No reproducible normalized result is retained in this baseline feed."
+      "message": "Requires SKYSCANNER_API_KEY partner credentials in environment."
+    },
+    "eDreams": {
+      "status": "unsupported",
+      "message": "Requires EDREAMS_API_KEY credentials in environment."
+    },
+    "BreckenWander": {
+      "status": "unsupported",
+      "message": "Requires BRECKENWANDER_API_KEY credentials in environment."
     },
     "Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages": {
       "status": "not_configured",
-      "message": "No reliable structured package connector is configured in this baseline feed."
+      "message": "No structured Israeli package provider API connector is configured."
     }
   },
   "price_drop_alerts": [],
-  "history_observations_added": 0,
+  "history_observations_added": 3,
   "deals": [
     {
       "stable_id": "cy-larnaca|2026-09-27|2026-10-02|IZ-unknown|booking-298238",
@@ -119,7 +166,7 @@
       "family_value": null,
       "effective_vacation_hours": 105.0,
       "verified": true,
-      "verified_at": "2026-08-29T22:10:33+03:00",
+      "verified_at": "2026-08-30T01:13:21.577756+03:00",
       "source_provenance": [
         "World Airfares live",
         "Booking.com live",

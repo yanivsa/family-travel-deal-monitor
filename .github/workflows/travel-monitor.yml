@@ -9,6 +9,7 @@ on:
       - 'travel/config.json'
       - 'travel/destination_whitelist.json'
       - 'travel/index.html'
+      - 'travel/collector.py'
       - 'monitor.py'
       - '.github/workflows/travel-monitor.yml'
 
@@ -30,14 +31,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate feed, persist component history, detect 30% drops, build dashboard data
+      - name: Collect live provider feed, validate, persist history, detect 30% drops, build dashboard data
         run: python monitor.py
 
-      - name: Commit processed data and history
+      - name: Commit processed data, feed and history
         run: |
           git config user.name "travel-monitor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add travel/data.json travel/history.jsonl
+          git add travel/data.json travel/history.jsonl travel/provider-feed.json
           if git diff --cached --quiet; then
             echo "No processed data changes"
           else
