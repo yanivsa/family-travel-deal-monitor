@@ -1,52 +1,57 @@
-name: Hourly Family Travel Monitor
+name: Process Family Travel Provider Feed
 
 on:
-  schedule:
-    - cron: '7 * * * *'
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
-      - '.github/manual-monitor-trigger'
+      - 'travel/provider-feed.json'
+      - 'travel/config.json'
+      - 'travel/destination_whitelist.json'
+      - 'monitor.py'
+      - '.github/workflows/travel-monitor.yml'
 
 permissions:
   contents: write
   issues: write
 
 concurrency:
-  group: family-travel-monitor
+  group: family-travel-feed-processor
   cancel-in-progress: false
 
 jobs:
-  monitor:
+  process:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run monitor
-        env:
-          TRAVEL_PROVIDER_JSON_URL: ${{ secrets.TRAVEL_PROVIDER_JSON_URL }}
+      - name: Validate feed, persist component history, detect 30% drops, build dashboard data
         run: python monitor.py
-      - name: Commit refreshed data
+      - name: Commit processed data and history
         run: |
           git config user.name "travel-monitor-bot"
           git config user.email "actions@users.noreply.github.com"
           git add travel/data.json travel/history.jsonl
           if git diff --cached --quiet; then
-            echo "No verified data changes"
+            echo "No processed data changes"
           else
-            git commit -m "chore(travel): hourly refresh"
+            git commit -m "chore(travel): process live provider feed"
             git push
           fi
-      - name: Notify on meaningful change
+      - name: Create or update GitHub alert issue
         if: hashFiles('travel/alert.md') != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          EXISTING=$(gh issue list --state open --search 'Travel Deal Alert in:title' --json number --jq '.[0].number // empty')
+          EXISTING=$(gh issue list --state open --search 'Sukkot 30% Price Drop in:title' --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING" ]; then
             gh issue comment "$EXISTING" --body-file travel/alert.md
           else
-            gh issue create --title "Travel Deal Alert" --body-file travel/alert.md
+            gh issue create --title "Sukkot 30% Price Drop" --body-file travel/alert.md
           fi
+
+# Final production email delivery is intentionally not faked here.
+# Jules must add the supported email transport plus a successful workflow_dispatch E2E test
+# before ChatGPT fallback monitoring is removed.
