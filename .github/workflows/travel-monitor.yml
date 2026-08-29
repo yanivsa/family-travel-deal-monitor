@@ -14,6 +14,8 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: family-travel-feed-processor
@@ -52,6 +54,34 @@ jobs:
             gh issue create --title "Sukkot 30% Price Drop" --body-file travel/alert.md
           fi
 
-# Final production email delivery is intentionally not faked here.
-# Jules must add the supported email transport plus a successful workflow_dispatch E2E test
-# before ChatGPT fallback monitoring is removed.
+  deploy-pages:
+    needs: process
+    if: ${{ needs.process.result == 'success' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Prepare current processed site
+        run: |
+          mkdir -p _site
+          cp travel/index.html _site/index.html
+          cp travel/data.json _site/data.json
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+# Live provider collection is intentionally not claimed by this workflow yet.
+# The processor accepts only verified provider-feed input and reports degraded/no-live-collector otherwise.
+# Final production email delivery must also have a successful E2E test before it is considered complete.
