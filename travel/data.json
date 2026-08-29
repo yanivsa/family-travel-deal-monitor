@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-08-29 19:43 Asia/Jerusalem",
+  "status": "Live baseline verified from World Airfares + Booking.com; hourly provider adapters pending authorized API access",
+  "provider_health": {
+    "world_airfares": "verified live baseline",
+    "booking": "verified live baseline",
+    "skyscanner": "adapter pending",
+    "edreams": "adapter pending",
+    "breckenwander": "adapter pending"
+  },
+  "deals": [
+    {
+      "category": "BEST VALUE",
+      "destination": "איה נאפה, קפריסין",
+      "dates": "28.9–2.10.2026",
+      "flight": "Arkia (IZ), TLV→LCA 06:20–07:20 / LCA→TLV 08:20–09:20, ישיר, Cabin bag only",
+      "hotel": "Aktea Beach Village 4★ · Booking 8.6 · 2 חדרים",
+      "flight_ils": 6327.66,
+      "hotel_ils": 4012.43,
+      "total_ils": 10340.09,
+      "time_value": "מצוין",
+      "effective_vacation_hours": "כ-92 שעות",
+      "family_value": 96,
+      "why": "ארבעה לילות, טיסת בוקר מוקדמת, Kids Club, playground, בריכת ילדים וחוף — תמורה חזקה מאוד למחיר הכולל.",
+      "flight_url": "https://mcp.worldairfares.com/r/2sg2JYr1",
+      "hotel_url": "https://www.booking.com/hotel/cy/aktea-beach-village.html?aid=2438770&checkin=2026-09-28&checkout=2026-10-02&no_rooms=2&group_adults=2&group_children=3&age=10&age=7&age=2&selected_currency=ILS"
+    },
+    {
+      "category": "BEST PRICE",
+      "destination": "לרנקה, קפריסין",
+      "dates": "28.9–1.10.2026",
+      "flight": "Arkia (IZ), TLV→LCA 06:20–07:20 / LCA→TLV 08:20–09:20, ישיר, Cabin bag only",
+      "hotel": "Best Western Plus Larco Hotel 4★ · Booking 8.6 · 2 חדרים",
+      "flight_ils": 4550.77,
+      "hotel_ils": 3299.39,
+      "total_ils": 7850.16,
+      "time_value": "טוב",
+      "effective_vacation_hours": "כ-69 שעות",
+      "family_value": 91,
+      "why": "מחיר כולל חריג כרגע; ההלוך מצוין, אבל חזרת 08:20 מחייבת יציאה מוקדמת מהמלון ומחלישה את היום האחרון.",
+      "flight_url": "https://mcp.worldairfares.com/r/gRJUAL1t",
+      "hotel_url": "https://www.booking.com/hotel/cy/larco-larnaca.html?aid=2438770&checkin=2026-09-28&checkout=2026-10-01&no_rooms=2&group_adults=2&group_children=3&age=10&age=7&age=2&selected_currency=ILS"
+    },
+    {
+      "category": "SMART UPGRADE / SURPRISE",
+      "destination": "כרתים / הרסוניסוס, יוון",
+      "dates": "28.9–1.10.2026",
+      "flight": "Hahn Air Systems (H1), TLV→HER 13:00–14:50 / HER→TLV 12:00–13:40, ישיר, Cabin bag only",
+      "hotel": "Village Heights Resort 5★ · Booking 9.0 · 2 חדרים",
+      "flight_ils": 7658.65,
+      "hotel_ils": 2851.59,
+      "total_ils": 10510.24,
+      "time_value": "טוב",
+      "effective_vacation_hours": "כ-65 שעות",
+      "family_value": 93,
+      "why": "5★ אמיתי במחיר מלון יוצא דופן, עם Kids Club, playground, משחקייה, בריכות ומיני-גולף. ההפתעה היא איכות הריזורט ביחס ל-total.",
+      "flight_url": "https://mcp.worldairfares.com/r/kDVBueB4",
+      "hotel_url": "https://www.booking.com/hotel/gr/village-heights-golf-resort.html?aid=2438770&checkin=2026-09-28&checkout=2026-10-01&no_rooms=2&group_adults=2&group_children=3&age=10&age=7&age=2&selected_currency=ILS"
+    }
+  ]
+}
