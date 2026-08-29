@@ -1,94 +1,305 @@
-import json, os, sys, urllib.request
-from datetime import datetime
+import json
+import statistics
+from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent
+CONFIG = ROOT / "travel" / "config.json"
+WHITELIST = ROOT / "travel" / "destination_whitelist.json"
+FEED = ROOT / "travel" / "provider-feed.json"
 DATA = ROOT / "travel" / "data.json"
 HISTORY = ROOT / "travel" / "history.jsonl"
 ALERT = ROOT / "travel" / "alert.md"
 TZ = ZoneInfo("Asia/Jerusalem")
-ALLOWED_DATES = {("2026-09-27","2026-10-01"),("2026-09-27","2026-10-02"),("2026-09-28","2026-10-01"),("2026-09-28","2026-10-02")}
-EXCLUDED = {"turkey","türkiye","egypt","jordan","uae","united arab emirates","bahrain","qatar","oman","saudi arabia","morocco","tunisia","algeria","lebanon","syria","iraq","yemen","kuwait","libya"}
-CATEGORIES = ["BEST VALUE","BEST PRICE","SMART UPGRADE / SURPRISE"]
 
-def load(path):
+
+def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
-def validate(payload):
-    deals = payload.get("deals", [])
-    if len(deals) != 3:
-        raise ValueError("provider payload must contain exactly 3 deals")
-    if [d.get("category") for d in deals] != CATEGORIES:
-        raise ValueError("categories/order do not match output contract")
-    for d in deals:
-        dep = d.get("departure_date")
-        ret = d.get("return_date")
-        if dep and ret and (dep, ret) not in ALLOWED_DATES:
-            raise ValueError(f"out-of-window deal: {dep} -> {ret}")
-        if ret == "2026-10-02" and d.get("return_morning") is not True:
-            raise ValueError("2026-10-02 return must be explicitly morning")
-        text = " ".join(str(d.get(k,"")) for k in ("destination","country","hotel")).lower()
-        if any(x in text for x in EXCLUDED):
-            raise ValueError(f"excluded destination: {d.get('destination')}")
-        if not d.get("verified", True):
-            raise ValueError("unverified deal cannot replace last-known-good Top 3")
-        if not isinstance(d.get("total_ils"), (int,float)) or d["total_ils"] <= 0:
-            raise ValueError("invalid total_ils")
-        if not d.get("flight_url") or not d.get("hotel_url"):
-            raise ValueError("reproducible flight_url and hotel_url are required")
-    return payload
 
-def fetch_provider(url):
-    req = urllib.request.Request(url, headers={"User-Agent":"family-travel-deal-monitor/1.0"})
-    with urllib.request.urlopen(req, timeout=45) as r:
-        return json.load(r)
+def parse_iso(value: str) -> datetime:
+    dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return dt if dt.tzinfo else dt.replace(tzinfo=TZ)
 
-def meaningful(old, new):
-    old_by = {d["category"]: d for d in old.get("deals", [])}
-    changes = []
-    for nd in new.get("deals", []):
-        od = old_by.get(nd["category"])
-        if not od:
-            changes.append(f"NEW {nd['category']}: {nd.get('destination')}")
+
+def normalize_text(value):
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def component_keys(candidate):
+    profile = candidate["destination_profile_id"]
+    dep = candidate["departure_date"]
+    ret = candidate["return_date"]
+    hotel = normalize_text(candidate.get("hotel"))
+    return {
+        "flight": f"flight|{profile}|{dep}|{ret}|direct",
+        "hotel": f"hotel|{hotel}|{dep}|{ret}",
+        "vacation": f"vacation|{profile}|{dep}|{ret}",
+    }
+
+
+def validate_feed(feed, config, whitelist):
+    if len(whitelist) != 64:
+        raise ValueError(f"destination whitelist must contain exactly 64 profiles, found {len(whitelist)}")
+
+    by_id = {item["id"]: item for item in whitelist}
+    allowed_returns = set(config["return_dates"])
+    expected_party = config["party"]
+
+    feed_cfg = feed.get("config", {})
+    if feed_cfg.get("origin") != config["origin"]:
+        raise ValueError("feed origin does not match config")
+    if feed_cfg.get("departure_date") != config["departure_date"]:
+        raise ValueError("feed departure date does not match config")
+    if set(feed_cfg.get("return_dates", [])) != allowed_returns:
+        raise ValueError("feed return dates do not match config")
+    if feed_cfg.get("direct_only") is not True:
+        raise ValueError("feed must be direct-only")
+    if feed_cfg.get("party") != expected_party:
+        raise ValueError("feed party does not match config")
+
+    known_gateways = {item["gateway_iata"] for item in whitelist}
+    checked = set(feed.get("scan_coverage", {}).get("gateways_live_checked_this_run", []))
+    if not checked.issubset(known_gateways):
+        raise ValueError("feed claims an unknown gateway in scan coverage")
+
+    valid = []
+    for candidate in feed.get("candidates", []):
+        if candidate.get("verified") is not True:
             continue
-        if nd.get("destination") != od.get("destination"):
-            changes.append(f"{nd['category']} changed: {od.get('destination')} → {nd.get('destination')}")
-        op, np = float(od.get("total_ils",0)), float(nd.get("total_ils",0))
-        if op > 0:
-            delta = np-op
-            pct = delta/op*100
-            if abs(delta) >= 300 or abs(pct) >= 4:
-                changes.append(f"{nd['category']} {nd.get('destination')}: ₪{delta:+,.0f} ({pct:+.1f}%)")
-        if abs(float(nd.get("effective_vacation_hours_num",0))-float(od.get("effective_vacation_hours_num",0))) >= 6:
-            changes.append(f"{nd['category']} time value changed materially")
-    return changes
+        profile_id = candidate.get("destination_profile_id")
+        profile = by_id.get(profile_id)
+        if not profile:
+            continue
+        if candidate.get("country") != profile.get("country"):
+            continue
+        if candidate.get("gateway_iata") != profile.get("gateway_iata"):
+            continue
+        if candidate.get("origin") != config["origin"]:
+            continue
+        if candidate.get("departure_date") != config["departure_date"]:
+            continue
+        if candidate.get("return_date") not in allowed_returns:
+            continue
+        if candidate.get("direct") is not True:
+            continue
+        if candidate.get("return_date") == "2026-10-02":
+            time_text = candidate.get("return_departure_time")
+            if not time_text:
+                continue
+            try:
+                hour, minute = (int(x) for x in time_text.split(":", 1))
+            except Exception:
+                continue
+            if hour >= 12 or hour < 0 or minute < 0 or minute > 59:
+                continue
+        if not isinstance(candidate.get("flight_total_ils"), (int, float)) or candidate["flight_total_ils"] <= 0:
+            continue
+        if not isinstance(candidate.get("hotel_total_ils"), (int, float)) or candidate["hotel_total_ils"] <= 0:
+            continue
+        if not isinstance(candidate.get("vacation_total_ils"), (int, float)) or candidate["vacation_total_ils"] <= 0:
+            continue
+        if not isinstance(candidate.get("stars"), (int, float)) or candidate["stars"] < config["hotel"]["min_stars"]:
+            continue
+        if not candidate.get("flight_url") or not candidate.get("hotel_url"):
+            continue
+        valid.append(candidate)
+
+    return valid
+
+
+def read_history():
+    if not HISTORY.exists():
+        return []
+    records = []
+    for raw in HISTORY.read_text(encoding="utf-8").splitlines():
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            records.append(json.loads(raw))
+        except json.JSONDecodeError:
+            continue
+    return records
+
+
+def baseline_for(history, key, component, now):
+    comparable = []
+    for row in history:
+        if row.get("key") != key or row.get("component") != component:
+            continue
+        try:
+            observed = parse_iso(row["observed_at"])
+            price = float(row["price_ils"])
+        except Exception:
+            continue
+        if price > 0 and observed < now:
+            comparable.append((observed, price))
+
+    if not comparable:
+        return None, 0
+
+    recent = [price for observed, price in comparable if observed >= now - timedelta(days=7)]
+    if recent:
+        return statistics.median(recent), len(recent)
+
+    older = sorted(comparable, key=lambda item: item[0], reverse=True)
+    return older[0][1], 1
+
+
+def detect_drops(valid_candidates, history, observed_at, threshold_pct):
+    alerts = []
+    for c in valid_candidates:
+        keys = component_keys(c)
+        components = {
+            "flight": float(c["flight_total_ils"]),
+            "hotel": float(c["hotel_total_ils"]),
+            "vacation": float(c["vacation_total_ils"]),
+        }
+        for component, current in components.items():
+            baseline, count = baseline_for(history, keys[component], component, observed_at)
+            if baseline is None or baseline <= 0:
+                continue
+            drop_pct = (baseline - current) / baseline * 100.0
+            if drop_pct >= threshold_pct:
+                alerts.append({
+                    "stable_id": c.get("stable_id"),
+                    "destination_profile_id": c["destination_profile_id"],
+                    "destination": c["destination"],
+                    "departure_date": c["departure_date"],
+                    "return_date": c["return_date"],
+                    "component": component,
+                    "baseline_ils": round(baseline, 2),
+                    "current_ils": round(current, 2),
+                    "drop_pct": round(drop_pct, 1),
+                    "history_observations": count,
+                    "flight_url": c.get("flight_url"),
+                    "hotel_url": c.get("hotel_url"),
+                    "package_url": c.get("package_url"),
+                })
+    return alerts
+
+
+def append_observations(valid_candidates, feed_verified_at, existing_history):
+    existing_ids = {row.get("observation_id") for row in existing_history}
+    rows = []
+    for c in valid_candidates:
+        keys = component_keys(c)
+        prices = {
+            "flight": c["flight_total_ils"],
+            "hotel": c["hotel_total_ils"],
+            "vacation": c["vacation_total_ils"],
+        }
+        for component, price in prices.items():
+            observation_id = f"{feed_verified_at}|{keys[component]}|{component}"
+            if observation_id in existing_ids:
+                continue
+            rows.append({
+                "observation_id": observation_id,
+                "observed_at": feed_verified_at,
+                "key": keys[component],
+                "component": component,
+                "price_ils": round(float(price), 2),
+                "destination_profile_id": c["destination_profile_id"],
+                "destination": c["destination"],
+                "departure_date": c["departure_date"],
+                "return_date": c["return_date"],
+                "source_provenance": c.get("source_provenance", []),
+            })
+    if rows:
+        HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        with HISTORY.open("a", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return len(rows)
+
+
+def rank_candidates(candidates):
+    def score(c):
+        family_value = c.get("family_value")
+        if isinstance(family_value, (int, float)):
+            return (0, -float(family_value), float(c["vacation_total_ils"]))
+        return (1, float(c["vacation_total_ils"]), 0)
+
+    ranked = sorted(candidates, key=score)[:3]
+    result = []
+    for idx, c in enumerate(ranked, 1):
+        item = dict(c)
+        item["rank"] = idx
+        item["category"] = "BEST VERIFIED" if idx == 1 else "VERIFIED ALTERNATIVE"
+        result.append(item)
+    return result
+
+
+def write_alert(alerts):
+    if not alerts:
+        ALERT.unlink(missing_ok=True)
+        return
+    component_names = {"flight": "טיסה", "hotel": "מלון", "vacation": "סה״כ חופשה"}
+    lines = ["# 🚨 Sukkot 30%+ Price Drop", ""]
+    for a in alerts:
+        lines.append(
+            f"- **{a['destination']}** {a['departure_date']}→{a['return_date']} · "
+            f"{component_names[a['component']]}: ₪{a['baseline_ils']:,.0f} → ₪{a['current_ils']:,.0f} "
+            f"(**-{a['drop_pct']:.1f}%**; baseline n={a['history_observations']})"
+        )
+        if a.get("flight_url"):
+            lines.append(f"  - Flight: {a['flight_url']}")
+        if a.get("hotel_url"):
+            lines.append(f"  - Hotel: {a['hotel_url']}")
+        if a.get("package_url"):
+            lines.append(f"  - Package: {a['package_url']}")
+    lines.extend(["", "Dashboard: https://yanivsa.github.io/family-travel-deal-monitor/"])
+    ALERT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
 
 def main():
-    current = load(DATA)
-    url = os.getenv("TRAVEL_PROVIDER_JSON_URL", "").strip()
-    if not url:
-        print("No authorized live provider endpoint configured; preserving last-known-good data.")
-        ALERT.unlink(missing_ok=True)
-        return 0
-    try:
-        incoming = validate(fetch_provider(url))
-    except Exception as e:
-        print(f"Provider failed validation/access: {e}; preserving last-known-good data.", file=sys.stderr)
-        ALERT.unlink(missing_ok=True)
-        return 0
-    incoming["checked_at"] = datetime.now(TZ).strftime("%Y-%m-%d %H:%M Asia/Jerusalem")
-    changes = meaningful(current, incoming)
-    DATA.write_text(json.dumps(incoming, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
-    HISTORY.parent.mkdir(parents=True, exist_ok=True)
-    with HISTORY.open("a", encoding="utf-8") as f:
-        f.write(json.dumps({"checked_at":incoming["checked_at"],"deals":[{"category":d["category"],"destination":d.get("destination"),"total_ils":d.get("total_ils"),"family_value":d.get("family_value")} for d in incoming["deals"]]}, ensure_ascii=False)+"\n")
-    if changes:
-        body = "# Travel deal monitor — meaningful change\n\n" + "\n".join(f"- {x}" for x in changes) + "\n\nDashboard: https://yanivsa.github.io/family-travel-deal-monitor/\n"
-        ALERT.write_text(body, encoding="utf-8")
-    else:
-        ALERT.unlink(missing_ok=True)
+    config = load_json(CONFIG)
+    whitelist = load_json(WHITELIST)
+    feed = load_json(FEED)
+    feed_verified_at = feed.get("verified_at")
+    if not feed_verified_at:
+        raise ValueError("provider feed is missing verified_at")
+    observed_at = parse_iso(feed_verified_at)
+
+    valid_candidates = validate_feed(feed, config, whitelist)
+    history_before = read_history()
+    alerts = detect_drops(
+        valid_candidates,
+        history_before,
+        observed_at,
+        float(config.get("price_drop_threshold_pct", 30)),
+    )
+    appended = append_observations(valid_candidates, feed_verified_at, history_before)
+
+    coverage = feed.get("scan_coverage", {})
+    data = {
+        "generated_at": datetime.now(TZ).isoformat(),
+        "timezone": "Asia/Jerusalem",
+        "currency": "ILS",
+        "search": config,
+        "automation": {
+            "status": coverage.get("status", "unknown"),
+            "provider_mode": "hybrid-live-feed",
+            "last_attempt_at": feed_verified_at,
+            "last_verified_live_refresh": feed_verified_at if valid_candidates else None,
+            "note": coverage.get("note", ""),
+        },
+        "scan_coverage": coverage,
+        "provider_health": feed.get("provider_health", {}),
+        "price_drop_alerts": alerts,
+        "history_observations_added": appended,
+        "deals": rank_candidates(valid_candidates),
+    }
+    DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_alert(alerts)
+    print(
+        f"processed feed {feed_verified_at}: {len(valid_candidates)} verified candidates, "
+        f"{appended} new component observations, {len(alerts)} 30%+ alerts"
+    )
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
