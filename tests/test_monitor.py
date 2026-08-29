@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -61,12 +60,21 @@ def feed_with(candidate):
     }
 
 
-def test_whitelist_contract_is_exactly_64_profiles_and_43_gateways():
+def test_whitelist_contract_is_exactly_64_profiles_and_48_gateways():
     _, whitelist = load_contract()
     assert len(whitelist) == 64
-    assert len({item["gateway_iata"] for item in whitelist}) == 43
+    assert len({item["gateway_iata"] for item in whitelist}) == 48
     ayia = next(x for x in whitelist if x["id"] == "cy-ayia-napa")
     assert ayia["gateway_iata"] == "LCA"
+
+
+def test_current_provider_feed_coverage_metadata_matches_whitelist():
+    _, whitelist = load_contract()
+    feed = monitor.load_json(monitor.FEED)
+    coverage = feed["scan_coverage"]
+    assert coverage["whitelist_profiles"] == len(whitelist) == 64
+    assert coverage["unique_gateways_total"] == len({x["gateway_iata"] for x in whitelist}) == 48
+    assert set(coverage["gateways_live_checked_this_run"]).issubset({x["gateway_iata"] for x in whitelist})
 
 
 def test_current_date_and_direct_contract():
