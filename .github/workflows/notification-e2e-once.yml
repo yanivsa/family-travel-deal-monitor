@@ -1,0 +1,26 @@
+name: Notification E2E Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/notification-e2e-once.yml'
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create TEST notification issue as GitHub Actions bot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "[TEST] Travel monitor GitHub email E2E" \
+            --body "@yanivsa — TEST E2E from GitHub Actions. This is not a real price-drop alert. The purpose is to verify GitHub email delivery end-to-end." \
+            --assignee yanivsa
