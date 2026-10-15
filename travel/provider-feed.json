@@ -13,15 +13,15 @@
     "unique_gateways_total": 48,
     "gateways_live_checked_this_run": ["LCA"],
     "status": "degraded",
-    "note": "Baseline evidence currently covers only LCA. Production scope allows return on 2026-10-01 at any valid time or 2026-10-02 before 12:00 local; full live collector coverage is still required."
+    "note": "Baseline evidence currently covers only LCA. Live execution across all 48 gateways requires provider API access/keys configured in GitHub secrets. Automated runtime must operate via GitHub Actions only without mock/fake endpoints."
   },
   "provider_health": {
-    "World Airfares": {"status":"ok","message":"A live direct round-trip baseline exists for LCA; full 48-gateway coverage and both allowed return windows remain required."},
-    "Booking.com": {"status":"ok","message":"A live family hotel baseline exists for Larnaca; full destination coverage remains required."},
-    "eDreams": {"status":"degraded","message":"No normalized all-passenger fare or verified package total is retained in this baseline feed."},
-    "BreckenWander": {"status":"degraded","message":"No independently normalized package total is retained in this baseline feed."},
-    "Skyscanner": {"status":"unsupported","message":"No reproducible normalized result is retained in this baseline feed."},
-    "Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages": {"status":"not_configured","message":"No reliable structured package connector is configured in this baseline feed."}
+    "World Airfares": {"status":"ok","message":"A live direct round-trip baseline exists for LCA. Expanding to all 48 gateways requires an authorized World Airfares API key set as WORLD_AIRFARES_API_KEY secret in GitHub Actions."},
+    "Booking.com": {"status":"ok","message":"A live family hotel baseline exists for Larnaca. Full destination coverage requires an official Booking.com Demand API key configured as BOOKING_COM_API_KEY secret in GitHub Actions."},
+    "eDreams": {"status":"unsupported","message":"eDreams live bundle querying requires an authorized eDreams/Opodo API key (EDREAMS_API_KEY secret) in GitHub Actions."},
+    "BreckenWander": {"status":"unsupported","message":"BreckenWander package integration requires authenticated partner access credentials (BRECKENWANDER_API_KEY secret) in GitHub Actions."},
+    "Skyscanner": {"status":"unsupported","message":"Skyscanner live flight querying requires an official Skyscanner Travel API key (SKYSCANNER_API_KEY secret) in GitHub Actions."},
+    "Issta/Gulliver/Kishrey Teufa/Daka90/Eshet/Ophir/Arkia/Israir packages": {"status":"not_configured","message":"No structured package API credentials configured. Requires direct B2B API contracts or official supplier feeds."}
   },
   "candidates": [
     {
