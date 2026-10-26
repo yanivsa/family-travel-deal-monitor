@@ -1,6 +1,6 @@
 ---
 name: israeli-flight-finder
-description: "Compare real flight prices from Ben Gurion (TLV): build pre-filled search links for Google Flights, Skyscanner, and KAYAK for the traveler's exact route and dates, read the live fares off them, and add Israeli-airline baggage for a true total cost. Use when someone asks to find or compare cheap flights from Israel, wants the cheapest fare or the cheapest dates to fly, or asks about El Al, Israir, Arkia, or Wizz Air baggage fees, seasonal TLV pricing, or Issta flight+hotel packages. Presents a real comparison and never quotes invented prices. Do NOT use for domestic travel within Israel (use israeli-travel-planner), train schedules (use railil), or hotel-only bookings."
+description: "Compare real flight prices from Ben Gurion (TLV): build pre-filled search links for Google Flights, Skyscanner, and KAYAK for the traveler's exact route and dates, read the live fares off them, and add Israeli-airline baggage for a true total cost. Use when someone asks to find or compare cheap flights from Israel, wants the cheapest fare or the cheapest dates to fly, or asks about El Al, Israir, Arkia, or Wizz Air baggage fees, seasonal TLV pricing, Issta flight+hotel packages, or whether to buy a ticket from the airline, an Israeli agency, or a foreign booking site such as Rift (formerly Soar). Presents a real comparison and never quotes invented prices. Do NOT use for domestic travel within Israel (use israeli-travel-planner), train schedules (use railil), or hotel-only bookings."
 license: MIT
 ---
 
@@ -8,203 +8,179 @@ license: MIT
 
 Find the cheapest flights from Ben Gurion Airport (TLV) by building a real, live price comparison for the traveler's exact route and dates, then reading the current fares off the search platforms. This skill does the comparison; it does not just list websites.
 
-> **TLV carrier status is highly volatile (verified July 2026).** The February 2026 Iran war closed Israeli airspace and shut Ben Gurion for roughly 40 days; the airport fully reopened on 9 April 2026 and operates normally now, but the foreign-carrier recovery is uneven, some airlines are back while several stay suspended into autumn 2026, and dates slip constantly with EASA conflict-zone advisories. Treat every carrier status below as a snapshot, not a guarantee. This volatility is exactly why the workflow in "How to Search" builds a live search for the user's own dates instead of trusting a static route list, always confirm the specific airline and route on its own site (or via a live search) before relying on it.
+> **TLV carrier status is highly volatile (verified late October 2026).** The Iran war that began on 28 February 2026 shut Israeli airspace to most foreign airlines; Ben Gurion partially reopened in early March for Israeli carriers and has been fully open since 9 April 2026. Most foreign carriers are back, a few stay suspended into 2027, and a single incident can still pull a carrier overnight (flydubai suspended all Israel flights on 30 September 2026). Treat every carrier status in this skill as a dated snapshot, not a guarantee. That is why "How to Search" builds a live search for the traveler's own dates, and why you confirm the specific airline and route on its own site before relying on it.
 
 ## Comparison Platforms
 
 Use multiple platforms -- each has different strengths. Never rely on a single source.
 
-| Platform | URL | Strengths | Hebrew UI |
-|----------|-----|-----------|-----------|
-| Google Flights | google.com/travel/flights?gl=IL&hl=he | AI-powered Flight Deals, price tracking, "Explore" map, fare history graphs | Yes |
-| Skyscanner | skyscanner.co.il | Broadest coverage (1000+ providers), "Everywhere" search, monthly price calendar | Yes |
-| KAYAK | il.kayak.com | Price alerts, fare forecasting, flexible date search | Yes |
-| Issta | issta.co.il | Israeli travel agency, package deals (flight+hotel), Hebrew-first UX, physical branches | Yes |
-| Lametayel | lametayel.co.il | Israeli comparison engine, aggregates Israeli operators, popular among Hebrew speakers | Yes |
+| Platform | URL | Strengths |
+|----------|-----|-----------|
+| Google Flights | google.com/travel/flights?gl=IL&hl=he | Direct airline prices, price tracking, "Explore" map, fare history graphs |
+| Skyscanner | skyscanner.co.il | Broad airline and OTA coverage, "Everywhere" search, monthly price calendar |
+| KAYAK | il.kayak.com | Price alerts, flexible date search |
+| Issta | issta.co.il | Israeli travel agency, flight+hotel packages, Hebrew service |
+| Lametayel | lametayel.co.il | Israeli travel site with flight comparison |
 
-### When to Use Which Platform
-
-- **Cheapest fare overall**: Start with Google Flights (best for direct airline prices), then cross-check on Skyscanner (catches OTA deals Google misses).
-- **Flexible destination** ("anywhere cheap"): Skyscanner "Everywhere" search or Google Flights "Explore" map.
-- **Package deals (flight+hotel)**: Issta excels at bundled packages that save hundreds of NIS vs booking separately.
-- **Hebrew-only users**: Issta and Lametayel have the best Hebrew UX. Google Flights and Skyscanner also have full Hebrew interfaces.
-- **Price tracking**: Google Flights and KAYAK both offer email alerts when prices drop on tracked routes.
-
-### Google Flights AI Flight Deals
-
-Google Flights offers an AI-powered "Flight Deals" feature available in Israel in Hebrew. Users can describe what they want in natural language (e.g., "a one-week winter trip to a city with great food, direct flights only") and the tool suggests matching flights. Access it at google.com/travel/flights with locale set to Israel.
+Start with Google Flights (direct airline prices) and cross-check Skyscanner (OTA deals); use Skyscanner "Everywhere" or the Google Flights "Explore" map for "anywhere cheap", Issta for flight+hotel packages, and Google Flights or KAYAK for price alerts. Per-platform detail: `references/comparison-platforms.md`.
 
 ## Israeli Airlines
 
 ### El Al (LY) -- Flag Carrier
 
 - **Hub**: Ben Gurion (TLV)
-- **Network**: As of summer 2026, El Al runs roughly 900 weekly flights to 50+ international destinations, its largest-ever schedule, including a record North American program (~55 weekly flights). It kept flying through the February 2026 war (and ran rescue flights) while foreign carriers suspended, so it still holds an outsized share of TLV traffic.
+- **Network**: El Al's summer 2026 schedule, announced before the war, planned about 900 weekly flights to 50+ destinations and a record 55 weekly to North America. For winter 2026-27 it runs 45 weekly flights to six US destinations, including San Francisco.
 - **Website**: elal.com
-- **Does not fly Shabbat**: El Al does not operate on Shabbat or Jewish holidays - see the "Shabbat-Aware Scheduling" section below before planning return flights.
+- **Does not fly Shabbat**: El Al does not fly passengers on Shabbat or Jewish holidays - see "Shabbat-Aware Scheduling" below before planning return flights.
 - **Frequent flyer**: Matmid, whose program has four tier statuses above base membership (Silver, Gold, Platinum, Top Platinum). You advance by earning "Diamonds", the more Diamonds, the faster you climb.
 
-**Baggage policy:**
+**Baggage policy (verified October 2026 on elal.com):**
 
 | Fare class | Carry-on | Checked bags |
 |------------|----------|--------------|
-| Economy Lite | 1 x 8 kg (56x45x25 cm) + 1 personal item | None included |
+| Economy Lite | 1 x 8 kg (56x45x25 cm) + 1 personal item (gate-checked on Europe/UAE, below) | None included (paid add-on) |
 | Economy Classic | 1 x 8 kg + 1 personal item | 1 x 23 kg |
-| Economy Flex | 1 x 8 kg + 1 personal item | 1 x 23 kg |
-| Premium | 1 x 8 kg + 1 personal item | 2 x 23 kg |
-| Business | 1 x 16 kg (56x45x25 cm) + 1 personal item | 2 x 32 kg |
+| Economy Flex | 2 carry-ons, 8 kg each (12 kg total) + 1 personal item | 1 x 23 kg (2 x 23 kg to the Far East and Africa) |
+| Premium | 2 carry-ons, 8 kg each (12 kg total) + 1 personal item | 2 x 23 kg |
+| Business | 2 carry-ons, 16 kg each (20 kg total) + 1 personal item | 2 x 32 kg |
 
-**Economy Lite restriction (Europe/UAE)**: Since May 2025, Lite fare passengers on flights to/from Europe or the UAE must check their carry-on at the gate (free of charge). Only a personal item (max 38x30x18 cm) is allowed in the cabin. This does NOT apply to US routes or Classic/Flex fares. Matmid Frequent Flyer members with Silver status or higher are exempt.
-
-**Matmid members**: Silver status and above are exempt from the Lite gate-check and get enhanced carry-on privileges.
+**Economy Lite restriction (Europe/UAE)**: Since 21 May 2025, Lite passengers on flights to/from Europe or the UAE must send their carry-on to the hold at the gate (free). Only a personal item (38x30x18 cm) stays in the cabin. Matmid members with Silver status or higher are exempt. North America routes sell only Classic and Flex, and on flights departing the US, TSA rules allow one carry-on plus one personal item in the cabin. Extra bags bought online cost up to 50% less than at the airport.
 
 ### Israir (6H)
 
-- **Hub**: Ben Gurion (TLV), Ramon Airport (Eilat)
-- **Network**: ~49 international destinations (Europe, New York, India, Central Asia) + domestic (Eilat, Haifa)
+- **Hub**: Ben Gurion (TLV)
+- **Network**: Europe and Mediterranean leisure routes plus New York JFK (new route, autumn 2026)
 - **Website**: israir.co.il
-- **Fleet**: Transitioning to all-Airbus (A320/A330); A330s for long-haul (New York, Asia)
 
-**Baggage policy (updated July 2026, verify on israir.co.il):**
+**Baggage policy (verified October 2026 on israir.co.il, international flights except New York):**
 
-| Item | Weight | Cost (advance) | Cost (airport) |
-|------|--------|----------------|----------------|
-| Personal item | Small bag (under seat) | Free | Free |
-| Carry-on | 10 kg | $30 per direction | $40 |
+| Item | Weight / Size | Cost (advance) | Cost (at Ben Gurion) |
+|------|---------------|----------------|----------------------|
+| Personal item | 40x30x20 cm | Free | Free |
+| Carry-on | 10 kg, 55x40x25 cm | $30 per direction | $40 |
 | 1st checked bag | 23 kg | $65 per direction | $100 |
-| 2nd checked bag | 23 kg | $80 per direction | -- |
-| Bags 3-5 (each) | 23 kg | $120 per direction | -- |
+| 2nd checked bag | 23 kg | $80 per direction | $120 |
+| Bags 3-5 (each) | 23 kg | $120 per direction | $150 |
 | Overweight (24-30 kg, first bag only) | -- | +$20 per direction | +$70 |
 
-Israir's published advance first-bag fee is $65 per direction and $100 at Ben Gurion. Always confirm the live figure on the Israir baggage-policy page before booking.
-
-Standard fares do not include checked baggage. Some vacation packages may bundle bags.
+"Advance" means on the Israir site or personal area up to 6 hours before take-off. Standard fares include no checked bag, **except New York**: there a carry-on and checked bags are included (economy 1 x 23 kg, premium 2 x 23 kg, business 2 x 32 kg). Always confirm the live figure on the Israir baggage-policy page before booking.
 
 ### Arkia (IZ)
 
-- **Hub**: Ben Gurion (TLV), Ramon Airport (Eilat)
-- **Network**: ~40 international destinations including New York, Bangkok, European cities, Greek islands
+- **Hub**: Ben Gurion (TLV)
+- **Network**: pre-war plans (February 2026) announced about 40 summer destinations; check current routes on arkia.co.il
 - **Website**: arkia.co.il
-- **New for 2026**: Business class on select European routes (Paris first), plus Phuket, Malaga, Ibiza, Vilnius, Hanoi
 
-**Baggage policy (international flights, verify on arkia.co.il):**
-
-| Item | Weight / Size | Cost (advance) | Cost (airport) |
-|------|---------------|----------------|----------------|
-| Hand bag (under-seat) | 20x30x40 cm, no weight limit | Free | Free |
-| Trolley bag | 8 kg (25x45x56 cm) | $25 | $30 / EUR 25 |
-| Checked bag | 20 kg | $50 | $90 / EUR 85 |
-| Excess per kg | -- | -- | $10 / EUR 10 |
-
-Second checked bag $70 advance / $100 airport, third $90 advance / $120 airport (verified on arkia.co.il, July 2026).
+**Baggage**: arkia.co.il blocks automated reading, so this skill carries no Arkia fee table. Read the carry-on and checked-bag allowance and price for the specific route and fare in Arkia's booking flow, and never assume a bag is included or excluded.
 
 ### Low-Cost Carriers
 
-**Wizz Air (W6)**: Hungarian low-cost carrier. Wizz had been expanding aggressively at TLV, but the February 2026 war forced it to suspend all Israel operations along with everyone else, and its earlier hub-base plans were frozen. Wizz resumed TLV operations on **May 28, 2026**, reconnecting Tel Aviv with hubs such as London, Budapest, Rome, Bucharest, Larnaca, Milan, and Athens, with frequencies still ramping up over summer 2026. Verify the specific route on wizzair.com. Only a small personal item (40x30x20 cm) is free on base fares; cabin bags and checked bags are paid add-ons.
+**Wizz Air (W6)**: Hungarian low-cost carrier. The February 2026 war forced it to suspend all Israel operations; Wizz resumed TLV on **May 28, 2026** and has kept expanding (in September 2026 it added London Gatwick, Catania, Venice, Cluj and Iasi). Verify the specific route on wizzair.com. Only a personal item (40x30x20 cm) is free on base fares; the 55x40x23 cm trolley needs WIZZ Priority, and checked bags are paid add-ons sold at 10, 20, 26 or 32 kg.
 
-**Ryanair**: Has officially removed Tel Aviv from its route map. Cancelled 22 planned routes and roughly 1 million seats for the 2025-2026 season due to disputes with Ben Gurion Airport over slot allocation and Terminal 1 availability. As of July 2026, Ryanair still has no confirmed TLV return; any resumption is conditional on the airport resolving the slot and Terminal 1 dispute.
+**Ryanair**: Did not restart Tel Aviv for winter 2025-26 (22 routes, about 1 million seats) over a slot and Terminal 1 dispute with Ben Gurion Airport, saying it would return only once those were confirmed. As of October 2026 no return date had been announced.
 
-### Foreign Carriers
+### Foreign Carriers (snapshot, late October 2026)
 
-The February 2026 war reset this landscape. Some foreign carriers have returned, several stay suspended, and the dates slip frequently. The status below is as of July 2026.
+Per-airline dates and sources: `references/tlv-carrier-status.md`. Headlines:
 
-- **flydubai**: Operating TLV-Dubai again (up to ~10 daily flights before the early-June 2026 regional flare-up trimmed the schedule); verify the current Dubai-TLV frequency on flydubai.com. Still the main option for connections to the Gulf, Asia, and East Africa via Dubai.
-- **Emirates**: Fully withdrew from Tel Aviv before the 2026 war and has NOT returned as of July 2026. Dubai is served by flydubai, not Emirates.
-- **Turkish Airlines**: Still NOT flying Tel Aviv as of July 2026. It resumed several other regional routes (Abu Dhabi from 1 July, then Dammam, Kuwait, Bahrain) but has only said it is "considering" a TLV return, with no confirmed date. Verify on turkishairlines.com before assuming an Istanbul connection.
-- **Lufthansa Group** (Lufthansa, Swiss, Austrian, Brussels, ITA): Mostly back. Lufthansa and SWISS resumed TLV on 1 July 2026 and Austrian in June; Brussels Airlines stays suspended (through 24 October 2026). Verify the specific route.
-- **Other carriers**: Aegean, Air France, and Etihad (Abu Dhabi) are among the carriers operating again. Still suspended into autumn 2026 as of July: easyJet (not before autumn), United (~7 Sep), Delta (~6 Sep), Air Canada (~7 Sep), American (not before Jan 2027), plus Iberia and British Airways (return dates uncertain). Post-war schedules move weekly, so always verify current status on each airline's own site before relying on it.
+- **Flying**: Lufthansa, SWISS, Austrian, Eurowings, Brussels Airlines, ITA, Aegean, Air France, Etihad (Abu Dhabi, now the main Gulf connection), United (Newark, with Chicago and Washington from late October 2026), Delta (New York JFK), British Airways (London, from 25 October 2026), Iberia (Madrid, from 25 October 2026).
+- **Suspended**: flydubai (since 30 September 2026, until further notice), Emirates (no TLV service), Turkish Airlines (gave up its Ben Gurion slots in April 2025; check whether it has returned before assuming an Istanbul connection), easyJet (no confirmed date), American (through late March 2027), Air Canada (reports conflict: Toronto from 30 November 2026, or not before end of March 2027). Israeli airlines have not flown to Dubai since February 2026.
+- These change weekly: verify the route on the airline's own site before relying on it.
 
 ## Seasonal Pricing Guide
 
 ### Peak Periods (Most Expensive)
 
-- **Jewish holidays**: Rosh Hashana, Sukkot, Pesach -- prices spike 2-4 weeks before
+- **Jewish holidays**: Rosh Hashana, Sukkot, Pesach, and Hanukkah (a school break) -- prices climb in the weeks before
 - **Summer** (July-August): School vacation, highest demand
+- **Christmas and New Year** (late December to early January): Europe's own peak on top of Israeli demand
 - **Purim break** (March): Short but expensive window
 
 ### Shoulder Seasons (Moderate)
 
 - **April-May** (between Pesach and summer): Good weather, moderate prices
 - **September** (between summer and holidays): Brief window before Rosh Hashana
-- **October-November** (after Sukkot): Prices drop rapidly
+- **Mid-October to early November** (after Sukkot): Prices ease
 
 ### Off-Peak (Cheapest)
 
-- **January**: Cheapest month to fly from TLV
+- **January** (after the New Year return wave): usually the quietest month
 - **February** (excluding Purim): Low demand
-- **November-December** (excluding Hanukkah): Winter low season
+- **Mid-November to early December** (before Hanukkah): Winter low season
+
+### Upcoming Holiday Dates (Israel)
+
+- **Hanukkah 2026**: from the evening of Friday 4 December to Saturday 12 December 2026. Both ends fall on Shabbat.
+- **Purim 2027**: 23 March 2027.
+- **Pesach 2027**: from the evening of 21 April to 28 April 2027.
+
+For any other year, take the dates from hebcal.com (Israel schedule) rather than from memory.
 
 ## Shabbat-Aware Scheduling
 
 Hebrew-calendar timing constrains flight options in a way generic search tools ignore.
 
-- **El Al does not fly on Shabbat or Jewish holidays.** Its scheduled operations stop from Friday afternoon (before sundown) until Saturday after sundown. For observant travelers this is a feature; for everyone it means El Al has **no** Friday-evening or Saturday-daytime departures or arrivals. A Friday-night or Saturday return on El Al simply does not exist - you must fly Thursday, early Friday, or Saturday night onward. The same no-fly window blocks **outbound** Friday-evening and Saturday departures, not just returns.
-- **Israir** has, under its current ownership, also cancelled flights departing on Saturday and on Friday nights, observing Shabbat. So for Saturday departures, do not count on Israir either - verify on israir.co.il.
-- **Arkia** is the Israeli carrier most likely to operate on Shabbat. If a Friday-night or Saturday flight is essential and you want an Israeli airline, Arkia is usually the option to check first.
-- **Foreign carriers** fly seven days a week, so a Friday-night or Saturday departure from TLV generally means a foreign airline (or Arkia).
-- **Planning rule**: when building a return itinerary, fix the Shabbat window first. If the traveler is observant or wants an Israeli carrier, plan returns for Thursday, Friday before midday, or Saturday night. Around Jewish holidays the same no-fly window applies to El Al on the holiday itself, on top of the pre-holiday price spike.
+- **El Al does not fly passengers on Shabbat or Jewish holidays.** There is no El Al flight in the air between Friday before sundown and Saturday after nightfall, outbound or return: fly Thursday, Friday early enough to land before Shabbat, or Saturday night onward.
+- **Which holidays**: the rest days are Rosh Hashana, Yom Kippur, the first and last days of Sukkot and of Pesach, and Shavuot. Hanukkah, Purim and Chol HaMoed are not rest days, so they do not block flights.
+- **Israir and Arkia do fly on Shabbat**: as of May 2026, El Al is the only Israeli airline that does not. Haredi leaders have pressed Israir to stop under a boycott threat, so verify Israir's Shabbat schedule before relying on it.
+- **Foreign carriers**: check that the route actually runs on the day you need; many routes are not daily.
+- **Observant travelers, any carrier**: ask whether anyone keeps Shabbat or Yom Tov. If so, every flight, including connections, must land before candle-lighting at the arrival point (take the time for that date from hebcal.com), with a margin of several hours for delays and getting home, and not depart before nightfall at the end, whatever the airline.
+- **Planning rule**: fix the Shabbat window first. Hanukkah 2026 shows why: on El Al, a trip starting Friday 4 December must leave early enough to land before Shabbat, and a return on Saturday 12 December must wait until after nightfall.
 
-## Entry Requirements (Europe: EES and ETIAS)
+## Entry Requirements and Travel Documents
 
-A cheap fare is worthless if the traveler cannot board or enter, so check entry rules and passport validity before recommending any route.
+A cheap fare is worthless if the traveler cannot board or enter, so check documents for **every** passenger before recommending any route. Details and sources: `references/entry-documents.md`; for full visa rules and trip planning abroad use `israeli-abroad-trip-planner`.
 
-- **Passport validity:** confirm the passport is valid for at least 6 months beyond the return date (a safe rule for most destinations, though Schengen's own minimum is 3 months beyond departure from the area). For Schengen there is a second rule that trips up Israeli travelers with older passports: the passport must have been **issued within the last 10 years**, so a document renewed with a paper validity extension can be refused at boarding even if the printed expiry looks fine. Israeli passport renewals can also run into backlogs.
-- **EES (Entry-Exit System) is live.** Since 10 April 2026 the EU records non-EU travelers' biometrics (facial image and fingerprints) at Schengen external borders instead of stamping passports. Expect this at the border; no advance action is needed.
-- **ETIAS is not required yet.** As of July 2026 an Israeli traveler does NOT need ETIAS to fly to Europe. The EU's official timeline still targets a launch in late 2026 with a transitional period before it becomes mandatory (around 2027), but the rollout has repeatedly slipped and EU agencies have signalled the late-2026 date may move into 2027. Do not apply early through unofficial sites, and check the official EU travel page for the current status before a late-2026 or 2027 trip.
+| Destination | What an Israeli passport holder needs | Official site |
+|-------------|---------------------------------------|---------------|
+| Schengen / Europe | Nothing in advance yet: ETIAS is not operating; the EU's last stated target was the last quarter of 2026, but no launch date was announced as of late October 2026 | travel-europe.europa.eu/etias |
+| UK | ETA, required since 8 January 2025, for each traveler including babies, also for landside transit | gov.uk/eta |
+| USA | ESTA (Visa Waiver Program); an e-Passport is required, and CBP advises applying before buying tickets | esta.cbp.dhs.gov |
+| Canada | eTA with a national Israeli passport (a travel document in lieu of passport needs a visa) | canada.ca |
+| Any other country, and every transit country | Check that country's official immigration site, and confirm with the airline, before recommending the fare | the country's official site |
+
+Fees change, so read them on the official site; never apply through look-alike sites that charge more.
+
+- **Passport validity**: many countries require at least 6 months beyond the return date. Schengen requires validity 3 months beyond departure from the area AND issue within the last 10 years, so an old passport extended on paper can be refused at boarding. Passports of children under 16 are valid for only 5 years, so check theirs first.
+- **Passport timing**: a new biometric passport is issued about 6 weeks after the appointment. Within 48 hours of departure a temporary passport can be issued only at Ben Gurion. ESTA requires an e-Passport, so do not assume a temporary passport qualifies: for a US trip, confirm with the airline or CBP first and plan for the biometric passport.
+- **Authorizations follow the passport**: an ESTA or UK ETA is linked to the passport used to apply. A new passport (including a child's renewal) needs a new application before the trip.
+- **Dual nationals**: ask which passport each traveler will use. A US citizen, including an Israeli-American, does not apply for ESTA and travels to the US on the US passport; a British citizen does not need a UK ETA. For leaving and entering Israel, check the Population and Immigration Authority's current rule for dual citizens.
+- **Names**: book every traveler exactly as the English name line of the passport they will carry; name corrections after booking can be expensive, especially on low-cost carriers and through OTAs.
+- **EES** is fully operational since 10 April 2026: Schengen borders record biometrics instead of stamping passports. No advance action is needed.
+- **Travel warnings**: before booking a cheap "anywhere" destination, check its National Security Council travel-warning level (gov.il, phone 02-666-7444, 24/7).
 
 ## Booking Strategies
 
 ### Timing
 
-- **Book several weeks out, not months.** Hard day/dollar "optimal window" claims date fast and rarely beat active price tracking. For European leisure routes from TLV, roughly 6-8 weeks out is a reasonable target; expect a 2-4 week pre-holiday spike around the chagim.
-- **Day-of-week effects are small and shift yearly.** Recent Expedia data put the cheapest day to *fly* mid-week (Tuesday, around 14% below the peak day domestically) with weekend departures at a premium; the cheapest day to *book* moves year to year. Do not over-optimize the day, set a price alert instead.
+- **Book several weeks out, not months, and track the price.** Hard "optimal window" claims date fast and rarely beat active price tracking. Around the chagim prices climb in the weeks before the holiday; if the holiday is already close, tell the traveler to book now rather than wait for a dip.
+- **Day-of-week effects are small and shift yearly.** Expedia's 2026 data for US domestic flights put Tuesday departures about 14% below Sunday, and named Friday the cheapest day to book; neither is a TLV rule. Do not over-optimize the day, set a price alert instead.
 - Set price alerts on Google Flights or KAYAK for routes you're watching, then pounce when the fare dips below the "typical" band on the fare-history graph.
 
 ### Money-Saving Tips
 
 1. **Compare across 3+ platforms**: Prices differ significantly between platforms for the same route
-2. **Check package deals on Issta**: Flight+hotel bundles often beat booking separately by hundreds of shekels
+2. **Check package deals on Issta**: Flight+hotel bundles can beat booking separately
 3. **Use "Everywhere" search on Skyscanner**: Find the cheapest destination for your dates instead of picking a destination first
 4. **Consider nearby airports**: For European destinations, flying to a nearby city and taking a train can be cheaper (e.g., fly to Bergamo instead of Milan)
-5. **Book baggage in advance**: All Israeli airlines charge significantly more for baggage purchased at the airport vs online in advance
-6. **Check Wizz Air for European routes**: Low-cost fares start very low but add-ons (bags, seats) add up -- compare total cost including bags
-7. **Flexible dates**: Shifting departure by 1-2 days can save 30%+ on the same route
+5. **Book baggage in advance**: El Al and Israir charge significantly more for baggage bought at the airport than online in advance
+6. **Check Wizz Air for European routes**: Low-cost fares start very low but add-ons (bags, seats) add up -- compare total cost including extras
+7. **Flexible dates**: Shifting departure by a day or two can change the fare noticeably; check the date grid or month view
 8. **Try multi-city / open-jaw**: For multi-stop Europe trips, flying into one city and out of another (e.g. into Rome, out of Milan) often beats a round-trip. Google Flights and Skyscanner both support multi-city search.
-9. **Protect against disruption**: TLV routes still get suspended on short notice (EASA conflict-zone advisories). For non-refundable foreign-carrier fares, prefer a refundable/flexible fare or travel insurance that covers airspace closure and conflict disruption, and check the airline's rebooking policy before booking. This is the most likely way to lose money on a 2026 TLV booking.
-
-### Deal Sources (Israeli)
-
-Error fares and flash deals vanish fast and rarely appear on the big aggregators. Israeli travelers track them through dedicated channels:
-
-- **Secret-flights sites** (e.g. secretflights.co.il, "טיסות סודיות") that surface mispriced fares.
-- **Telegram deal channels and Facebook groups** focused on TLV departures.
-
-Treat these as a complement to the aggregators, not a replacement, and book fast because error fares get pulled quickly.
-
-### Points and Miles
-
-For frequent flyers the cash price is not the only lever:
-
-- **El Al Matmid** points can be redeemed for award flights, and tier status adds baggage and lounge value.
-- **Israeli cards** (Isracard, American Express Israel, Max) often earn Matmid points or airline miles, and some dollar-linked cards add travel perks. Compare the points cost against the cash fare before booking.
+9. **Protect against disruption**: TLV routes still get suspended on short notice. Israeli law gives rights when a flight to or from Israel is cancelled or delayed; for who is liable and how to claim, use `israeli-flight-compensation`. The real money-loss risks are separately ticketed self-transfers (a refund covers only the cancelled segment) and non-refundable hotels, so prefer a single ticket and refundable hotel or insurance that covers airspace closure.
+10. **Mind who sells the ticket**: when prices are close, buy from the airline or an Israeli agency rather than an unknown foreign OTA at the top of Skyscanner or KAYAK. In a mass cancellation the seller handles your refund, and Israeli consumer-protection cancellation rules may not reach a foreign seller.
 
 ### Flight+Hotel Packages
 
-Israeli travel agencies (Issta, Lametayel) specialize in package deals that bundle flights and hotels. These can be significantly cheaper than booking separately, especially for popular destinations like Greece, Cyprus, Turkey, and European cities.
+Israeli agencies (Issta, Lametayel) sell flight+hotel packages that can beat booking separately, especially for Greece, Cyprus, and European city breaks.
 
-### Departure Airport: TLV vs Ramon (Eilat)
+### More Booking Levers
 
-Most international flights leave from Ben Gurion (TLV), but Ramon Airport (ETM) near Eilat also handles some international and charter routes, and Israir and Arkia base operations there. For travelers in the south, departing from Ramon can save the long drive to TLV; for everyone else, TLV almost always has more routes, more frequencies, and more price competition. When comparing, factor the ground cost and time to reach each airport - a cheaper Ramon fare can be eaten up by getting to Eilat. Check both when your destination is one Ramon actually serves (mostly European leisure routes and charters).
-
-### Kosher and Special Meals
-
-- **El Al** serves kosher meals by default on all flights - no special request needed (its kitchen is certified kosher).
-- **Israir and Arkia** also cater to the Israeli market and offer kosher options; confirm when booking.
-- **Foreign carriers** do not serve kosher by default. If you keep kosher, request a kosher meal (special meal code KSML) at booking or at least 24-48 hours before departure - it cannot be arranged at the gate. The same applies to other special meals (vegetarian, vegan, gluten-free). On very short flights some carriers serve no meal at all, so a special-meal request may simply not apply.
+Israeli deal sites (e.g. secretflights.co.il), points and miles (El Al Matmid, Israeli cards), and kosher or special meals (request KSML on foreign carriers when booking): see `references/booking-extras.md`.
 
 ## How to Search
 
-> **Plan for TLV security.** The Israel Airports Authority advises arriving **3 hours before international departures** (more at peak times, and summer 2026 is congested) because of Israel's layered security screening. Factor this in when a cheap early-morning fare would require a pre-dawn arrival.
+> **Plan for TLV security.** The Israel Airports Authority advises arriving **3 hours before international departures** (more at holiday peaks). Factor this in when a cheap early-morning fare means a pre-dawn arrival.
 
 **This skill's job is to compare real flights, not to name websites.** Follow the workflow below: build the pre-filled search links for the traveler's exact route and dates, read the live fares off them, add baggage to get a true total, and return an actual comparison. Never substitute remembered or estimated prices for this work (see "Never invent a price").
 
@@ -214,14 +190,17 @@ Assume TLV as the origin and ask only for what is missing:
 
 1. Destination (city or airport code, or "anywhere cheap")
 2. Dates (specific, or a flexible month)
-3. Number of passengers
-4. Checked bag needed, or carry-on only?
+3. Passengers: adults, each child's age on the travel dates, lap infants under 2, and which passport each traveler will use
+4. How many checked bags in total, or carry-on only?
 5. Nonstop only, or connections OK?
-6. Airline preference or budget ceiling (optional)
+6. Does anyone keep Shabbat or Yom Tov?
+7. Airline preference or budget ceiling (optional)
+
+Fares and baggage differ by age band (infant, child, adult) and a child discount is never guaranteed, so do not compute one yourself: read the price the platform returns for the exact passenger mix.
 
 ### Step 2: Build the Pre-Filled Search Links
 
-Construct a real, click-ready search URL for each platform from the route and dates. These are verified URL patterns, substitute the destination and dates. Skyscanner takes the lowercase city name or IATA code and dates as `YYMMDD`; KAYAK takes IATA codes (Rome = `ROM`, Paris = `PAR`, Larnaca = `LCA`) and dates as `YYYY-MM-DD`; Google Flights takes plain city names.
+Construct a real, click-ready search URL for each platform from the route and dates. These URL patterns are taken from the platforms' own result pages; substitute the destination and dates. Skyscanner takes the lowercase airport code (e.g. `ath`, `lca`) and dates as `YYMMDD`; KAYAK takes IATA codes (Rome = `ROM`, Paris = `PAR`, Larnaca = `LCA`) and dates as `YYYY-MM-DD`; Google Flights takes plain city names.
 
 | Platform | Round-trip URL template |
 |----------|-------------------------|
@@ -229,47 +208,55 @@ Construct a real, click-ready search URL for each platform from the route and da
 | Skyscanner | `https://www.skyscanner.co.il/transport/flights/tlv/{dest}/{YYMMDD}/{YYMMDD}/` |
 | KAYAK | `https://il.kayak.com/flights/TLV-{DEST}/{YYYY-MM-DD}/{YYYY-MM-DD}?sort=price_a` |
 
+- **Passengers**: every template opens for 1 adult. Set the full passenger mix on each platform's search form before reading prices; do not guess passenger query parameters.
 - **One-way**: drop the second date (Skyscanner: one `YYMMDD` segment; KAYAK: one date).
-- **Flexible month** (find the cheapest dates): Skyscanner whole-month view, `https://www.skyscanner.co.il/transport/flights/tlv/{dest}/{YYMM}00/` (note the `00` in place of the day).
-- **"Anywhere cheap"**: Skyscanner "Everywhere", `https://www.skyscanner.co.il/transport/flights/tlv/anywhere/{YYMMDD}/`, or the Google Flights "Explore" map.
+- **Flexible month** (find the cheapest dates): open the Skyscanner link and switch the date to "Whole month", or use the Google Flights date grid; do not guess a month URL.
+- **"Anywhere cheap"**: Skyscanner's "Everywhere" destination or the Google Flights "Explore" map, set on the search form.
 - **Nonstop / max-price**: build the base link, then apply the nonstop and price filters on the results page (the sidebar filters), do not guess filter query parameters.
-- **Keep one currency**: use `il.kayak.com` (as shown), NOT `www.kayak.com` which defaults to USD. Google Flights `curr=ILS` and Skyscanner `.co.il` already return shekels. Mixing a USD KAYAK fare into the NIS total in Step 4 is the currency trap in Gotcha 6.
-- Worked example (TLV→Rome, 3-10 Aug 2026): Google Flights `...q=Flights+from+TLV+to+Rome+on+2026-08-03+returning+2026-08-10...`; Skyscanner `.../tlv/rome/260803/260810/`; KAYAK `.../TLV-ROM/2026-08-03/2026-08-10?sort=price_a`.
+- **Keep one currency**: use `il.kayak.com` (as shown), NOT `www.kayak.com` which defaults to USD. Google Flights `curr=ILS` and Skyscanner `.co.il` are set up for shekels, but confirm the currency each page actually shows. Mixing a USD KAYAK fare into the NIS total in Step 4 is the currency trap in Gotcha 6.
+- Worked example (TLV→Athens over Hanukkah, 6-11 Dec 2026): Google Flights `...q=Flights+from+TLV+to+Athens+on+2026-12-06+returning+2026-12-11...`; Skyscanner `.../tlv/ath/261206/261211/`; KAYAK `.../TLV-ATH/2026-12-06/2026-12-11?sort=price_a`.
 
 ### Step 3: Pull the Live Fares
 
 Open each link and read the actual results, do not stop at building the URLs:
 
-**Fastest path when a flight-search MCP is connected.** If the Soar MCP (`https://mcp.flysoar.ai/mcp`) is available this turn, call `soar_search_flights` (`origin: "TLV"`, `destination`, `date`, `return_date`, `passengers`) for structured live offers from Duffel inventory: carrier, flight numbers, stops, duration, fare brand, and baggage counts, with no API key. Coverage varies by route, so read carriers off the response. Binding rules (detail in `references/soar-mcp-usage.md`):
+**Fastest path when a flight-search MCP is connected.** If the Rift flight MCP (formerly Soar, `https://mcp.rift.co`) is available this turn, call `soar_search_flights` (`origin: "TLV"`, `destination`, `date`, `return_date`, and `passengers_detail` with each child's age, or `passengers`) for structured live offers with fare brand and baggage counts, no API key. Binding rules (full detail in `references/soar-mcp-usage.md`):
 
-- **USD only** (`currency: "ILS"` is rejected). Never convert from a remembered rate, that breaks the same "read it this session" rule that governs fares. Read a live rate (e.g. Bank of Israel, `https://www.boi.org.il/roles/markets/exchangerates/`) and show it, or leave the row in USD rather than inventing a NIS total.
-- **Put the ~3% Israeli card foreign-currency fee inside the total you rank on**, not in the notes, or Soar rows win comparisons they should lose.
-- **One reseller is not a comparison.** Do not assume it surfaces airline site-only promotions or Israeli charter seats. Soar is used precisely when no browser tool exists, which is also when the other platforms are unreadable, so the cross-check below is usually impossible. Say plainly that it is a single-source result and do not call it "the cheapest available".
-- **Use the offer's own baggage counts** in Step 4, not the static tables, or you will charge for an included bag.
-- **Never call `soar_book_flight`, and never send the traveler to Soar to buy.** It executes payment in one call, and Soar is not the agency of record and names no billing entity in its terms, leaving no clear counterparty for a refund or dispute.
-- **Rate limit** 5/min, 30/hr per IP, so it cannot serve flexible-month or "anywhere cheap" searches; use the Skyscanner month view for those.
+- **USD only.** Convert with a live rate you read this session (e.g. Bank of Israel, `https://www.boi.org.il/roles/markets/exchangerates/`) and show it, or leave the row in USD. Put the ~3% Israeli card foreign-currency fee inside the ranked total.
+- **One source is not a comparison.** It may miss airline-site promotions and Israeli charter seats; say plainly that the result is single-source and never call it "the cheapest available".
+- **Use the offer's own baggage counts** in Step 4, not the static tables.
+- **Search only.** Never call `soar_book_flight` and never send the traveler to Rift to buy (see Gotcha 9).
+- **Rate limit** 5/min, 30/hr per IP, so use the Skyscanner "Whole month" or "Everywhere" options for flexible-month or "anywhere cheap" searches.
 
-- With a browser tool (or a flights MCP), navigate to each URL and read the top 3-5 fares: airline, price in shekels, number of stops, total duration, and departure/return times.
+- With a browser tool (or a flights MCP), navigate to each URL and read the top 3-5 fares: airline, fare brand (e.g. Lite or Classic), price in shekels, whether the price is per person or for all passengers, number of stops, total duration, and departure/return times.
 - **All three platforms render fares with JavaScript**, KAYAK included. Reading live prices needs a real browser/rendering tool or a flights MCP; a plain `WebFetch` returns an empty shell with no fares. If you do NOT have a browser tool this turn, do not report a comparison from `WebFetch` alone, hand the traveler the pre-filled links from Step 2 instead (see "Never invent a price").
-- Cross-check at least two platforms, the same route routinely differs by hundreds of NIS between Google Flights (direct airline fares) and Skyscanner (OTA deals).
+- Cross-check at least two platforms; the same route can differ noticeably between Google Flights (airline fares) and Skyscanner (which adds OTA prices).
 - For flexible dates, read the cheapest-date cells from the Skyscanner month calendar or the Google Flights date grid.
 - For real-time TLV flight status on travel day, the [Ben Gurion Flights](https://agentskills.co.il/en/mcp/ben-gurion-flights) MCP gives live arrivals and departures (it does not return prices).
 
 ### Step 4: Normalize to Total Cost
 
-A base fare is not comparable until you add what the traveler actually needs. For each option compute:
+A base fare is not comparable until you add what the traveler actually needs. Rank on the booking total for the whole party:
 
-`base fare + checked-bag fee (if needed) + seat selection (if wanted) = total per person`.
+`total = fare for the whole itinerary + paid extras (carry-on, checked bags beyond the fare's allowance, seats), each per passenger and per direction`.
 
-**Get everything into one currency first.** The Israir and Arkia tables are in dollars and euros and a Soar fare is in dollars, while the Step 5 table is in NIS. Convert with a rate you read this session, state that rate, and add the ~3% Israeli card conversion fee to anything billed in foreign currency. Never convert from memory; if you cannot read a rate, show the original currency (Gotcha 8).
+- **Fare**: if the platform shows a price for all passengers, use it once; if per person, add each passenger's own fare (child fares differ). Count a round-trip fare once, not once per direction.
+- **Paid extras are per passenger, per item, per direction.** One Israir first bag at $65 is $130 round trip; a family of four with one bag each pays 4 x $65 x 2 = $520 before conversion. A carry-on is paid on Israir outside New York ($30 per direction) and Wizz (Priority) but included on El Al, so a carry-on-only trip still needs this line.
+- **Do not double count**: add only carry-ons and bags beyond what the fare includes (Israir New York, El Al Classic and up).
+- **Seats**: a family needs adjacent seats, so on basic fares add a seat fee for every passenger who occupies a seat (not lap infants), each direction.
+- **Infants and children**: read each carrier's infant fare and allowance (bag, stroller, car seat) in its booking flow; do not assume either way.
+- **Use advance online prices** and say so in the Notes; airport prices are higher.
+- **Fees without a table here** (Arkia, Wizz, Aegean, the El Al Lite bag add-on): read the price for that fare brand in the carrier's own booking flow. Aggregators usually surface El Al's cheapest brand, Lite, which has no bag, so check the Classic price on elal.com before claiming El Al wins once bags are added.
 
-Pull the bag fees from the Israeli-airline tables above: El Al includes a checked bag on Classic and up, while Israir, Arkia, and Wizz charge for almost everything. A low base fare on Israir, Arkia, or Wizz routinely loses to El Al Classic once a 23 kg bag is added, this is the single most common comparison mistake.
+**Get everything into one currency first.** The Israir table is in dollars and a Rift fare is in dollars, while the Step 5 table is in NIS. Convert with a rate you read this session, state that rate, and add the ~3% Israeli card conversion fee only to amounts the card is actually charged in foreign currency (if an airline bills shekels, use its shekel amount). Never convert from memory; if you cannot read a rate, show the original currency (Gotcha 8).
+
+El Al includes a checked bag on Classic and up, while Israir (outside New York) and Wizz charge for almost everything. A low base fare on Israir or Wizz routinely loses to El Al Classic once a 23 kg bag is added, this is the single most common comparison mistake.
 
 ### Step 5: Present the Comparison
 
 Return a table with the REAL fares you pulled, cheapest total first:
 
-| Option | Airline | Route / Stops | Base (NIS) | Bags (NIS) | Total (NIS) | Source | Notes |
+| Option | Airline | Route / Stops | Base (NIS) | Extras (NIS) | Total (NIS) | Source | Notes |
 |--------|---------|---------------|-----------|-----------|------------|--------|-------|
 | 1 | ... | ... | ... | ... | ... | Google Flights / Skyscanner / Soar (USD) | e.g. no Shabbat return, gate-check carry-on on Lite |
 
@@ -279,59 +266,61 @@ Then give a one-line recommendation covering cheapest total, best value (price v
 
 ### Never Invent a Price
 
-**Every number in the comparison must come from a page you actually loaded this session.** Do not estimate, guess, or fill in "typical" fares from memory, flight prices change hourly and a fabricated comparison is worse than none. If you cannot read live prices this turn (no web or browser access, the page is bot-blocked, or a captcha appears), do NOT write any numbers. Instead, hand the traveler the ready-to-click links you built in Step 2, pre-filled for their exact route and dates, and say plainly that these open live results to compare because you could not read the fares yourself this turn. Being honest about missing live data keeps the skill trustworthy; fake numbers destroy it.
+**Every number in the comparison must come from a page you actually loaded this session.** Do not estimate or fill in "typical" fares from memory; prices change hourly and a fabricated comparison is worse than none. If you cannot read live prices this turn (no browser access, a bot block, or a captcha), write no numbers: hand the traveler the Step 2 links, pre-filled for their route and dates, and say plainly that you could not read the fares yourself.
 
 ## Recommended MCP Servers
 
 | MCP | What It Adds |
 |-----|-------------|
 | [Ben Gurion Flights](https://agentskills.co.il/en/mcp/ben-gurion-flights) | Real-time TLV arrivals and departures from the Israel Airports Authority. Complement the price-comparison workflow with live flight status on travel day. |
-| Soar Flight Booking MCP (`https://mcp.flysoar.ai/mcp`) | Structured live airfare from Duffel inventory via `soar_search_flights`, no API key needed for search. Use it for prices in Step 3 when you have no browser tool. Prices in USD only. Search tool only: never call its booking tool and never send the traveler there to buy (see Gotcha 9). |
+| Soar Flight Booking MCP, now Rift (`https://mcp.rift.co`) | Structured live airfare via `soar_search_flights`, no API key needed for search. Use it for prices in Step 3 when you have no browser tool. Prices in USD only. Search tool only: never call its booking tool and never send the traveler there to buy (see Gotcha 9). |
 
 ## Gotchas
 
-1. **El Al Lite fares to Europe/UAE have no cabin carry-on**: Since May 2025, Lite fare passengers must check their carry-on at the gate (free). Only a small personal item fits in the cabin. This catches many budget travelers off guard. Does not apply to US routes.
+1. **El Al Lite fares to Europe/UAE have no cabin carry-on**: Lite passengers must send their carry-on to the hold at the gate (free). Only a small personal item fits in the cabin. Lite is not sold on North America routes at all.
 
-2. **Baggage pricing varies wildly between Israeli airlines**: Arkia charges for checked bags on all fares; El Al includes bags on Classic and above; Israir charges for everything except a personal item (as of July 2026). Always check the specific fare's baggage inclusion before comparing base prices.
+2. **Baggage pricing varies wildly between Israeli airlines**: El Al includes bags on Classic and above; Israir charges for everything except a personal item, except on New York flights where bags are included; Arkia's allowance must be read live per route. Always check the specific fare's baggage inclusion before comparing base prices.
 
-3. **Israeli holiday pricing is front-loaded**: Prices spike 2-4 weeks BEFORE the holiday, not on the holiday itself. By the time Rosh Hashana starts, the peak pricing window has passed for most routes.
+3. **Israeli holiday pricing is front-loaded**: Prices climb in the weeks BEFORE the holiday, not on the holiday itself, so a late booking for the holiday period is usually the expensive one.
 
-4. **"Direct" does not mean "nonstop" on some platforms**: Skyscanner and some OTAs list flights with a technical stop (same plane, brief stop) as "direct." Verify on the airline's own site if nonstop matters to you.
+4. **"Direct" may not mean "nonstop"**: a listing can call a flight with an intermediate stop on the same plane "direct". Check the number of stops on the airline's own site if nonstop matters.
 
-5. **Issta and Lametayel prices include different things**: Issta package prices often include hotel+transfers; Lametayel shows flight-only comparison. Comparing a Lametayel flight price to an Issta package price is not apples-to-apples.
+5. **Package and flight-only prices are not comparable**: a package price may include hotel and transfers. Compare a package with a package, and a flight with a flight.
 
-6. **Currency mismatches**: Google Flights shows prices in NIS by default for Israeli users, but Skyscanner may show USD or EUR depending on settings. Ensure you're comparing in the same currency.
+6. **Currency mismatches**: any platform can show another currency if its settings or site version differ (KAYAK's www site, for one). Check the currency on every page before comparing.
 
-7. **Prices must be pulled live, never recalled**: fares change hourly, so a remembered or "typical" number is almost always wrong by the time it is quoted. Read the actual current price off the search links every time you compare, and if you cannot read live prices this turn, hand over the pre-filled links instead of guessing. A comparison built from invented numbers is the fastest way to lose the user's trust.
+7. **Prices must be pulled live, never recalled**: fares change hourly, so a remembered or "typical" number is almost always wrong. Read the current price off the search links every time, and if you cannot, hand over the pre-filled links instead of guessing (see "Never Invent a Price").
 
-8. **Not every number in this skill is already in shekels**: the Israir and Arkia baggage tables above are quoted in dollars and euros, and the Soar MCP quotes fares in dollars. The Step 5 table is in NIS. Dropping a `$65` Israir bag into a shekel column as `65` understates it threefold and flips this skill's own conclusion that El Al Classic beats the low-cost carriers once a bag is added. Convert every non-shekel figure using a rate you read this session, state it, and never convert from memory (see Step 4).
+8. **Not every number in this skill is already in shekels**: the Israir baggage table above is quoted in dollars, and the Rift (formerly Soar) MCP quotes fares in dollars. The Step 5 table is in NIS. Dropping a `$65` Israir bag into a shekel column as `65` badly understates it and can flip this skill's own conclusion that El Al Classic beats the low-cost carriers once a bag is added. Convert every non-shekel figure using a rate you read this session, state it, and never convert from memory (see Step 4).
 
-9. **The Soar MCP is a price source, never a booking venue**: it quotes in USD only and draws on a single inventory pool that may miss site-only promotions and Israeli charter seats, so a Soar-only result is not "the cheapest available". Its `soar_book_flight` tool runs sign-in, verification, and payment in one call, and Soar is not the travel agency of record and names no billing entity in its terms, leaving an Israeli traveler no clear counterparty for a refund or disputed charge, and the consumer-protection cancellation rules covering a seller operating in Israel may not reach a foreign one. See `references/soar-mcp-usage.md`.
+9. **The Rift (formerly Soar) MCP is a price source, never a booking venue**: `soar_book_flight` runs sign-in, verification, and payment within one tool. Under Rift's terms Rift is the booking agent, refunds and disputes run through it rather than the airline under Delaware law and binding Delaware arbitration, and buyers appoint it to cancel and rebook their ticket on their own initiative. Israeli consumer-protection cancellation rules may not reach it. See `references/soar-mcp-usage.md`.
+
+10. **A one-adult link prices a family wrong**: the Step 2 links open for one adult. Reading those fares and multiplying by four ignores child fares, lap infants, and per-passenger bags and seats. Set the real passenger mix first and compute the party total per Step 4.
 
 ## Bundled Resources
 
 - `references/comparison-platforms.md` -- Detailed platform comparison with URLs and features
-- `references/airline-baggage-quick-ref.md` -- Quick-reference baggage table for all Israeli airlines
-- `references/soar-mcp-usage.md` -- Soar flight-search MCP: tools, parameters, binding constraints
+- `references/airline-baggage-quick-ref.md` -- Quick-reference baggage table for El Al, Israir and Wizz Air
+- `references/soar-mcp-usage.md` -- Rift (formerly Soar) flight-search MCP: tools, parameters, binding constraints
+- `references/tlv-carrier-status.md` -- Foreign-carrier status at TLV with dates and sources (October 2026 snapshot)
+- `references/entry-documents.md` -- ETIAS, UK ETA, US ESTA, Canada eTA, and Israeli passport timing, with sources
+- `references/booking-extras.md` -- Israeli deal sites, points and miles, kosher and special meals
 
 ## Reference Links
 
 | Source | URL | What to Check |
 |--------|-----|---------------|
-| El Al baggage policy | https://www.elal.com/eng/baggage | Current carry-on weight/size, Lite fare restrictions, Matmid tier exemptions |
-| Israir baggage policy | https://www.israir.co.il/Passengers_Info/Baggage_Policy.html | Advance vs airport carry-on and checked-bag pricing, personal item rules |
-| Arkia baggage policy | https://www.arkia.co.il/en/luggage-information | Trolley and checked-bag fees, weight limits, excess/kg charges |
-| Wizz Air baggage & routes | https://www.wizzair.com/en-gb/help-centre/booking-information-and-services/baggage/baggage-allowance | Base fare inclusions, WIZZ Priority add-on, current Israel route list |
-| Google Flights (Israel) | https://www.google.com/travel/flights?gl=IL&hl=he | Flight Deals AI availability, fare-history bands, tracked-price alerts |
-| Expedia 2026 Air Hacks (AFAR coverage) | https://www.afar.com/magazine/expedia-data-shows-new-best-day-to-book-cheaper-flights | Cheapest booking day, best day to fly, optimal booking window |
-| ETIAS (official EU) | https://travel-europe.europa.eu/etias_en | Whether ETIAS is required now for Israeli citizens, how to apply, EES rollout |
+| El Al hand baggage | https://www.elal.com/eng/baggage/hand-baggage | Carry-on allowance per fare, Lite gate-check rule, Matmid exemption |
+| Israir baggage policy | https://www.israir.co.il/Passengers_Info/Baggage_Policy.html | Advance vs airport carry-on and checked-bag pricing, New York inclusions |
+| Wizz Air baggage & routes | https://www.wizzair.com/en-gb/help-centre/booking-information-and-services/baggage/baggage-allowance | Base fare inclusions, WIZZ Priority add-on, checked-bag weights |
+| ETIAS (official EU) | https://travel-europe.europa.eu/en/etias | Whether ETIAS is operating yet and its announced start date |
+| UK ETA (gov.uk) | https://www.gov.uk/eta | ETA requirement and current fee |
+| Hebcal (Israel holidays) | https://www.hebcal.com/holidays/ | Holiday and Shabbat dates for the travel year |
 
 ## Troubleshooting
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| Google Flights shows no results from TLV | Locale not set to Israel | Add `?gl=IL&hl=he` to the URL |
-| Skyscanner prices differ from airline site | OTA pricing vs direct pricing | Book directly with airline if price matches; OTA prices may include markup or different fare class |
-| Issta shows only packages, not flights | Default view shows packages | Navigate to the "Flights" (טיסות) section specifically |
-| Price alert not working | Tracking not enabled | On Google Flights, click the toggle next to "Track prices" after searching a route |
-| Baggage fees not shown upfront | Low-cost carrier practices | Click through to the booking page to see total cost with bags and extras |
+| Prices appear in dollars or euros | Site version or currency setting | Use the Step 2 links (`curr=ILS`, `il.kayak.com`, `.co.il`) or switch the currency selector, then confirm the currency shown |
+| Aggregator price differs from the airline's site | Different seller, fare brand, or a seller markup | Compare the fare brand and the seller; book with the airline if the price matches |
+| Bag fees not shown on the results page | Extras are priced later in the booking flow | Continue to the booking page to read the bag and seat prices before ranking |
